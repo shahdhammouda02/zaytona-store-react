@@ -1,0 +1,171 @@
+import React from 'react';
+import {
+  Grid,
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  Container,
+  Box,
+  Button,
+} from '@mui/material';
+import categorybg from "../../image/freepik__upload__51798 1.png";
+import foodcategory from "../../image/foodcategory.png";
+import clothescategory from "../../image/clothescategory.png";
+import handcraftescategory from "../../image/handcraftscategory.png";
+import bookscategory from "../../image/bookscategory.png";
+import oliveoil from "../../image/oliveoil.png";
+import dress from "../../image/dress.jpg";
+import craft from "../../image/craft.jpg";
+import books from "../../image/books.jpg";
+
+const CategorySection = () => {
+  const categories = [
+    {
+      title: 'المنتجات الغذائية',
+      banner: foodcategory,
+      items: [
+        { id: 1, name: 'زيت الزيتون الفلسطيني الاصيل لتر واحد', image: oliveoil, salary: '5.99' },
+        { id: 2, name: 'زيت الزيتون الفلسطيني الاصيل لتر واحد', image: oliveoil, salary: '5.99' },
+      ],
+    },
+    {
+      title: 'الملابس والاكسسوارات',
+      banner: clothescategory,
+      items: [
+        { id: 1, name: 'ثوب فلاحي فلسطيني', image: dress, salary: '20.99' },
+        { id: 2, name: 'ثوب فلاحي فلسطيني', image: dress, salary: '20.99' },
+      ],
+    },
+    {
+      title: 'الحرف اليدوية',
+      banner: handcraftescategory,
+      items: [
+        { id: 1, name: 'زبدية فخار', image: craft, salary: '3.99' },
+        { id: 2, name: 'زبدية فخار', image: craft, salary: '3.99' },
+      ],
+    },
+    {
+      title: 'الكتب والمطبوعات',
+      banner: bookscategory,
+      items: [
+        { id: 1, name: 'رواية الطنطورية للكاتبة رضوى عاشور', image: books, salary: '5.99' },
+        { id: 2, name: 'رواية الطنطورية للكاتبة رضوى عاشور', image: books, salary: '5.99' },
+      ],
+    },
+  ];
+
+  return (
+    <Box
+      sx={{
+        backgroundImage: `url(${categorybg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        minHeight: '100vh',
+        width: '100%',
+        padding: '80px 20px',
+      }}
+    >
+      <Container>
+        {categories.map((category, index) => (
+          <Box
+            key={index}
+            sx={{
+              background: '#ffffff',
+              padding: '30px',
+              borderRadius: '10px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              marginBottom: '40px',
+            }}
+          >
+            {/* Category Title */}
+            <Typography
+              variant="h4"
+              gutterBottom
+              textAlign="center"
+              fontWeight="bold"
+              sx={{ marginBottom: '20px' }}
+            >
+              {category.title}
+            </Typography>
+
+            <Grid container spacing={4} justifyContent="center">
+              {/* Category Banner */}
+              <Grid item xs={12} sm={6} md={4}>
+                <CardMedia
+                  component="img"
+                  image={category.banner}
+                  alt={category.title}
+                  sx={{
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    maxHeight: '300px',
+                  }}
+                />
+              </Grid>
+
+              {/* Category Items */}
+              {category.items.map((item) => (
+                <Grid item xs={12} sm={6} md={4} key={item.id}>
+                  <Card
+                    sx={{
+                      maxWidth: 240,
+                      margin: '0 auto',
+                      borderRadius: '10px',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                      transition: 'transform 0.3s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
+                      },
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={item.image}
+                      alt={item.name}
+                      sx={{ objectFit: 'contain', padding: '10px' }}
+                    />
+                    <CardContent>
+                      <Typography
+                        variant="body1"
+                        gutterBottom
+                        fontWeight="bold"
+                        sx={{ fontSize: '14px', textAlign: 'center' }}
+                      >
+                        {item.name}
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{ color: '#555', fontSize: '16px', textAlign: 'center' }}
+                      >
+                        السعر: {item.salary} $
+                      </Typography>
+                      <Box textAlign="center" mt={2}>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          sx={{
+                            borderRadius: '50px',
+                            padding: '8px 20px',
+                            textTransform: 'none',
+                          }}
+                        >
+                          أضف إلى السلة
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        ))}
+      </Container>
+    </Box>
+  );
+};
+
+export default CategorySection;
