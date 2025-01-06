@@ -9,7 +9,7 @@ import {
   Box,
   Button,
 } from '@mui/material';
-import categorybg from "../../image/freepik__upload__51798 1.png";
+import categorybg from "../../image/categorysec.jpg";
 import foodcategory from "../../image/foodcategory.png";
 import clothescategory from "../../image/clothescategory.png";
 import handcraftescategory from "../../image/handcraftscategory.png";
@@ -25,8 +25,8 @@ const CategorySection = () => {
       title: 'المنتجات الغذائية',
       banner: foodcategory,
       items: [
-        { id: 1, name: 'زيت الزيتون الفلسطيني الاصيل لتر واحد', image: oliveoil, salary: '5.99' },
-        { id: 2, name: 'زيت الزيتون الفلسطيني الاصيل لتر واحد', image: oliveoil, salary: '5.99' },
+        { id: 1, name: 'زيت الزيتون الفلسطيني الاصلي لتر واحد', image: oliveoil, salary: '5.99' },
+        { id: 2, name: 'زيت الزيتون الفلسطيني الاصلي لتر واحد', image: oliveoil, salary: '5.99' },
       ],
     },
     {
@@ -55,6 +55,19 @@ const CategorySection = () => {
     },
   ];
 
+  // Function to insert <br /> after specific words
+  const insertLineBreak = (text, word) => {
+    const parts = text.split(word);
+    return (
+      <>
+        {parts[0]}
+        {word}
+        <br />
+        {parts[1]}
+      </>
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -72,7 +85,7 @@ const CategorySection = () => {
           <Box
             key={index}
             sx={{
-              background: '#ffffff',
+              background: '#FCF9F6',
               padding: '30px',
               borderRadius: '10px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -85,24 +98,38 @@ const CategorySection = () => {
               gutterBottom
               textAlign="center"
               fontWeight="bold"
-              sx={{ marginBottom: '20px' }}
+              sx={{ marginBottom: '20px', color: '#2c3e50' }}
             >
               {category.title}
             </Typography>
 
-            <Grid container spacing={4} justifyContent="center">
+            <Grid container spacing={4} alignItems="center">
               {/* Category Banner */}
               <Grid item xs={12} sm={6} md={4}>
-                <CardMedia
-                  component="img"
-                  image={category.banner}
-                  alt={category.title}
+                <Card
                   sx={{
-                    borderRadius: '10px',
+                    width: '350px',
+                    height: '400px',
+                    borderRadius: '74px 0px 0px 74px',
+                    overflow: 'hidden',
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    maxHeight: '300px',
+                    transition: 'transform 0.3s ease',
+                    '&:hover': {
+                      transform: 'scale(1.03)',
+                    },
                   }}
-                />
+                >
+                  <CardMedia
+                    component="img"
+                    image={category.banner}
+                    alt={category.title}
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                </Card>
               </Grid>
 
               {/* Category Items */}
@@ -123,25 +150,30 @@ const CategorySection = () => {
                   >
                     <CardMedia
                       component="img"
-                      height="140"
+                      height="160"
                       image={item.image}
                       alt={item.name}
-                      sx={{ objectFit: 'contain', padding: '10px' }}
+                      sx={{ objectFit: 'contain', padding: '10px', borderRadius: '10px' }}
                     />
                     <CardContent>
                       <Typography
                         variant="body1"
                         gutterBottom
                         fontWeight="bold"
-                        sx={{ fontSize: '14px', textAlign: 'center' }}
+                        sx={{ fontSize: '14px', textAlign: 'center', color: '#34495e' }}
                       >
-                        {item.name}
+                        {/* Insert line break after specific words */}
+                        {item.name.includes('الاصلي')
+                          ? insertLineBreak(item.name, 'الاصلي')
+                          : item.name.includes('للكاتبة')
+                          ? insertLineBreak(item.name, 'للكاتبة')
+                          : item.name}
                       </Typography>
                       <Typography
                         variant="h6"
                         sx={{ color: '#555', fontSize: '16px', textAlign: 'center' }}
                       >
-                        السعر: {item.salary} $
+                        {item.salary} $
                       </Typography>
                       <Box textAlign="center" mt={2}>
                         <Button
@@ -151,6 +183,11 @@ const CategorySection = () => {
                             borderRadius: '50px',
                             padding: '8px 20px',
                             textTransform: 'none',
+                            fontWeight: 'bold',
+                            backgroundColor: '#27ae60',
+                            '&:hover': {
+                              backgroundColor: '#219653',
+                            },
                           }}
                         >
                           أضف إلى السلة
