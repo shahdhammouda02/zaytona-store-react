@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Hero from "./hero/hero";
 import PrimarySearchAppBar from "../src/components/navbar/nav";
 import CategorySection from "./components/category/CategorySection";
+import Footer from "./components/footer/footer";
 
 const theme = createTheme({
   typography: {
@@ -15,6 +16,7 @@ function App() {
       <PrimarySearchAppBar />
       <Hero />
       <CategorySection />
+      <Footer />
     </ThemeProvider>
   );
 }
