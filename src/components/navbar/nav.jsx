@@ -191,7 +191,7 @@ export default function PrimarySearchAppBar() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            paddingBottom:"20px",
+            paddingBottom: "20px",
           }}
         >
           <IconButton

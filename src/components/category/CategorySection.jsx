@@ -27,6 +27,7 @@ const CategorySection = () => {
       items: [
         { id: 1, name: 'زيت الزيتون الفلسطيني الاصلي لتر واحد', image: oliveoil, salary: '5.99' },
         { id: 2, name: 'زيت الزيتون الفلسطيني الاصلي لتر واحد', image: oliveoil, salary: '5.99' },
+        { id: 3, name: 'زيت الزيتون الفلسطيني الاصلي لتر واحد', image: oliveoil, salary: '5.99' },
       ],
     },
     {
@@ -35,6 +36,7 @@ const CategorySection = () => {
       items: [
         { id: 1, name: 'ثوب فلاحي فلسطيني', image: dress, salary: '20.99' },
         { id: 2, name: 'ثوب فلاحي فلسطيني', image: dress, salary: '20.99' },
+        { id: 3, name: 'ثوب فلاحي فلسطيني', image: dress, salary: '20.99' },
       ],
     },
     {
@@ -43,6 +45,7 @@ const CategorySection = () => {
       items: [
         { id: 1, name: 'زبدية فخار', image: craft, salary: '3.99' },
         { id: 2, name: 'زبدية فخار', image: craft, salary: '3.99' },
+        { id: 3, name: 'زبدية فخار', image: craft, salary: '3.99' },
       ],
     },
     {
@@ -51,6 +54,7 @@ const CategorySection = () => {
       items: [
         { id: 1, name: 'رواية الطنطورية للكاتبة رضوى عاشور', image: books, salary: '5.99' },
         { id: 2, name: 'رواية الطنطورية للكاتبة رضوى عاشور', image: books, salary: '5.99' },
+        { id: 3, name: 'رواية الطنطورية للكاتبة رضوى عاشور', image: books, salary: '5.99' },
       ],
     },
   ];
@@ -77,16 +81,18 @@ const CategorySection = () => {
         backgroundRepeat: 'no-repeat',
         minHeight: '100vh',
         width: '100%',
-        padding: '80px 20px',
+        padding: '80px 0px',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)', // اللون الأسود مع شفافية 50%
+        backgroundBlendMode: 'overlay',
       }}
     >
-      <Container>
+      <Box>
         {categories.map((category, index) => (
           <Box
             key={index}
             sx={{
               background: '#FCF9F6',
-              padding: '30px',
+              padding: '30px 0',
               borderRadius: '10px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               marginBottom: '40px',
@@ -105,7 +111,7 @@ const CategorySection = () => {
 
             <Grid container spacing={4} alignItems="center">
               {/* Category Banner */}
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={12} md={3}>
                 <Card
                   sx={{
                     width: '350px',
@@ -134,7 +140,7 @@ const CategorySection = () => {
 
               {/* Category Items */}
               {category.items.map((item) => (
-                <Grid item xs={12} sm={6} md={4} key={item.id}>
+                <Grid item xs={12} sm={12} md={3} key={item.id}>
                   <Card
                     sx={{
                       maxWidth: 240,
@@ -200,7 +206,7 @@ const CategorySection = () => {
             </Grid>
           </Box>
         ))}
-      </Container>
+      </Box>
     </Box>
   );
 };
