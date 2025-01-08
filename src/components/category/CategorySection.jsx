@@ -67,19 +67,19 @@ const CategorySection = ({ addToCart }) => {
       banner: bookscategory,
       items: [
         {
-          id: 1,
+          id: 10,
           name: "رواية الطنطورية للكاتبة رضوى عاشور",
           image: books,
           salary: "5.99",
         },
         {
-          id: 2,
+          id: 11,
           name: "رواية الطنطورية للكاتبة رضوى عاشور",
           image: books,
           salary: "5.99",
         },
         {
-          id: 3,
+          id: 12,
           name: "رواية الطنطورية للكاتبة رضوى عاشور",
           image: books,
           salary: "5.99",
@@ -87,21 +87,6 @@ const CategorySection = ({ addToCart }) => {
       ],
     },
   ];
-
-  const insertLineBreak = (text, word) => {
-    const parts = text.split(word);
-    if (parts.length > 1) {
-      return (
-        <>
-          {parts[0]}
-          {word}
-          <br />
-          {parts.slice(1).join(word)}
-        </>
-      );
-    }
-    return text;
-  };
 
   return (
     <Box
@@ -139,7 +124,12 @@ const CategorySection = ({ addToCart }) => {
               {category.title}
             </Typography>
 
-            <Grid container spacing={4} alignItems="center" width={"100% !important"}>
+            <Grid
+              container
+              spacing={4}
+              alignItems="center"
+              width={"100% !important"}
+            >
               <Grid item xs={12} sm={12} md={3}>
                 <Card
                   sx={{
@@ -165,7 +155,9 @@ const CategorySection = ({ addToCart }) => {
                     }}
                   />
                 </Card>
+                
               </Grid>
+              
 
               {category.items.map((item) => (
                 <Grid item xs={12} sm={6} md={3} key={item.id}>
@@ -204,11 +196,7 @@ const CategorySection = ({ addToCart }) => {
                           color: "#34495e",
                         }}
                       >
-                        {item.name.includes("الاصلي")
-                          ? insertLineBreak(item.name, "الاصلي")
-                          : item.name.includes("للكاتبة")
-                          ? insertLineBreak(item.name, "للكاتبة")
-                          : item.name}
+                        {item.name}
                       </Typography>
                       <Typography
                         variant="h6"
@@ -244,6 +232,26 @@ const CategorySection = ({ addToCart }) => {
                 </Grid>
               ))}
             </Grid>
+             {/* زر تسوق الآن */}
+             <Box textAlign="center" marginBottom="20px">
+              <Button
+                variant="contained"
+               
+                sx={{
+                  width:"170px !important",
+                  borderRadius: "50px",
+                  padding: "10px 30px",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  backgroundColor: "#1e8234",
+                  "&:hover": {
+                    backgroundColor: "#e4312c",
+                  },
+                }}
+              >
+                تسوق الآن
+              </Button>
+            </Box>
           </Box>
         ))}
       </Box>
