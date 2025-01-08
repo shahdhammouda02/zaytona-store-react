@@ -1,20 +1,28 @@
-import * as React from "react";
-import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import InputBase from "@mui/material/InputBase";
-import Badge from "@mui/material/Badge";
-import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import MoreIcon from "@mui/icons-material/MoreVert";
-import logo from "../../image/logo.png";
-import Person2Icon from "@mui/icons-material/Person2";
+import React, { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Badge,
+  Drawer,
+  List,
+  ListItem,
+  ListItemAvatar,
+  Avatar,
+  Box,
+  TextField,
+  styled,
+  alpha,
+  InputBase,
+} from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import Person2Icon from "@mui/icons-material/Person2";
+import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
+import logo from "../../image/logo.png";
+
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: "20px",
@@ -23,11 +31,11 @@ const Search = styled("div")(({ theme }) => ({
     backgroundColor: "#cdcdcd",
   },
   marginRight: theme.spacing(2),
-  marginLeft: theme.spacing(2), // Added spacing on left
-  width: "300px", // Width of the search box
+  marginLeft: theme.spacing(2),
+  width: "300px",
   [theme.breakpoints.up("sm")]: {
     marginLeft: theme.spacing(3),
-    width: "40%", // Let it take full width on larger screens
+    width: "40%",
     paddingRight: "30px",
   },
 }));
@@ -36,20 +44,17 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
   height: "100%",
   position: "absolute",
-  pointerEvents: "none",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  right: "80%", // Adjust based on your design needs
   color: "#CECECE",
-  right: "80%", // Adjust based on your design needs
+  right: "80%",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "black",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     width: "20%",
@@ -59,13 +64,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <>
       <AppBar
-        position="static"
+        position="sticky"
         sx={{ backgroundColor: "white", paddingTop: "20px" }}
       >
         <Toolbar>
@@ -82,8 +91,7 @@ export default function PrimarySearchAppBar() {
               style={{ width: "135px", height: "auto" }}
             />
           </IconButton>
-          {/* This Box is used to center the search input */}
-          <Box sx={{ display: "flex", justifyContent: "center", flexGrow: 1 }}>
+          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -94,7 +102,7 @@ export default function PrimarySearchAppBar() {
               />
             </Search>
           </Box>
-          <Box sx={{ display: "flex" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               sx={{
                 display: "flex",
@@ -104,11 +112,7 @@ export default function PrimarySearchAppBar() {
               }}
             >
               <Person2Icon
-                sx={{
-                  color: "#1e8234",
-                  fontSize: "35px",
-                  marginBottom: "5px",
-                }}
+                sx={{ color: "#1e8234", fontSize: "35px", marginBottom: "5px" }}
               />
               <span
                 style={{
@@ -156,15 +160,18 @@ export default function PrimarySearchAppBar() {
                 alignItems: "center",
                 margin: "auto",
               }}
+              onClick={toggleDrawer}
             >
-              <ShoppingCartIcon
-                sx={{
-                  color: "#000000",
-                  fontSize: "35px",
-                  marginBottom: "5px",
-                  transform: "scaleX(-1)",
-                }}
-              />
+              <Badge badgeContent={cartItems.length} color="error">
+                <ShoppingCartIcon
+                  sx={{
+                    color: "#000000",
+                    fontSize: "35px",
+                    marginBottom: "5px",
+                    transform: "scaleX(-1)",
+                  }}
+                />
+              </Badge>
               <span
                 style={{
                   margin: 0,
@@ -177,22 +184,10 @@ export default function PrimarySearchAppBar() {
                 سلة التسوق{" "}
               </span>
             </IconButton>
-
-            {/* <FavoriteIcon
-              sx={{ color: "#E4312C", fontSize: "35px", paddingRight: "20px" }}
-            />
-            <ShoppingCartIcon
-              sx={{ color: "black", fontSize: "35px", paddingRight: "20px" }}
-            /> */}
           </Box>
         </Toolbar>
         <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            paddingBottom: "20px",
-          }}
+          sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}
         >
           <IconButton
             sx={{
@@ -203,18 +198,19 @@ export default function PrimarySearchAppBar() {
               fontWeight: "bolder",
             }}
           >
-            <MenuIcon sx={{ color: "black" }} />
-            <span
+            <MenuIcon style={{ color: "black" }} />
+            <Typography
               style={{
                 margin: 0,
                 padding: 0,
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
+                // fontWeight:"bolder"
               }}
             >
               جميع المنتجات
-            </span>
+            </Typography>
           </IconButton>
           <IconButton
             sx={{
@@ -225,17 +221,18 @@ export default function PrimarySearchAppBar() {
               fontWeight: "bolder",
             }}
           >
-            <span
+            <Typography
               style={{
                 margin: 0,
                 padding: 0,
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
+                // fontWeight:"bolder"
               }}
             >
               المنتجات الغذائية
-            </span>
+            </Typography>
           </IconButton>
           <IconButton
             sx={{
@@ -246,17 +243,18 @@ export default function PrimarySearchAppBar() {
               fontWeight: "bolder",
             }}
           >
-            <span
+            <Typography
               style={{
                 margin: 0,
                 padding: 0,
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
+                // fontWeight:"bolder"
               }}
             >
-              الملابس والاكسسورات{" "}
-            </span>
+              الملابس والاكسسورات
+            </Typography>
           </IconButton>
           <IconButton
             sx={{
@@ -267,41 +265,75 @@ export default function PrimarySearchAppBar() {
               fontWeight: "bolder",
             }}
           >
-            <span
+            <Typography
               style={{
                 margin: 0,
                 padding: 0,
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
+                // fontWeight:"bolder"
               }}
             >
-              الحرف اليدوية{" "}
-            </span>
-          </IconButton>
-          <IconButton
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignContent: "center",
-              paddingLeft: "20px",
-              fontWeight: "bolder",
-            }}
-          >
-            <span
-              style={{
-                margin: 0,
-                padding: 0,
-                fontSize: "20px",
-                fontFamily: "Cairo",
-                color: "#000",
-              }}
-            >
-              الكتب والمطبوعات{" "}
-            </span>
+              الحرف اليدوية
+            </Typography>
           </IconButton>
         </Box>
       </AppBar>
-    </Box>
+      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer} style={{width:"120%"}}>
+        <Box sx={{ width: "100%", padding: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            السلة
+          </Typography>
+          {cartItems.length === 0 ? (
+            <Typography>السلة فارغة</Typography>
+          ) : (
+            <List  style={{width:"100%"}}>
+              {cartItems.map((item) => (
+                <ListItem
+                  key={item.id}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between", // Distributes elements evenly
+                    padding: "10px 0", // Adds space between items
+                    borderBottom: "1px solid #ddd", // Adds a separator between items
+                  }}
+                >
+                  <ListItemAvatar>
+                    <Avatar src={item.image} alt={item.name} />
+                  </ListItemAvatar>
+                  <Box sx={{ flexGrow: 1, marginLeft: 2 }}>
+                    <Typography variant="subtitle1" width={"100px"}>{item.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      السعر: {item.salary} $
+                    </Typography>
+                  </Box>
+                  <TextField
+                    type="number"
+                    size="small"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      updateQuantity(item.id, parseInt(e.target.value, 10))
+                    }
+                    inputProps={{ min: 1 }}
+                    sx={{ width: 100}}
+                  />
+                  <IconButton
+                    onClick={() => removeFromCart(item.id)}
+                    color="error"
+                  >
+                    إزالة
+                  </IconButton>
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </Box>
+      </Drawer>
+    </>
   );
-}
+};
+
+export default Navbar;

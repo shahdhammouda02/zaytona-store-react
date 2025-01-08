@@ -1,4 +1,4 @@
-import hero from "../image/hero (1).png";
+import hero from "../../image/hero (1).png";
 import { Box } from "@mui/material";
 
 export default function Hero() {
