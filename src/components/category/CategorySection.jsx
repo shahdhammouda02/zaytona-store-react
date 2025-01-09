@@ -8,15 +8,15 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import categorybg from "../../image/categorysec.jpg";
-import foodcategory from "../../image/foodcategory.png";
-import clothescategory from "../../image/clothescategory.png";
-import handcraftescategory from "../../image/handcraftscategory.png";
-import bookscategory from "../../image/bookscategory.png";
-import oliveoil from "../../image/oliveoil.png";
-import dress from "../../image/dress.jpg";
-import craft from "../../image/craft.jpg";
-import books from "../../image/books.jpg";
+import categorybg from "../../assets/images/categorybg.jpg";
+import foodcategory from "../../assets/images/foodcategory.png";
+import clothescategory from "../../assets/images/clothescategory.png";
+import handcraftescategory from "../../assets/images/handcraftscategory.png";
+import bookscategory from "../../assets/images/bookscategory.png";
+import oliveoil from "../../assets/images/oliveoil.png";
+import dress from "../../assets/images/dress.jpg";
+import craft from "../../assets/images/craft.jpg";
+import books from "../../assets/images/books.jpg";
 
 const CategorySection = ({ addToCart }) => {
   const categories = [
@@ -243,13 +243,14 @@ const CategorySection = ({ addToCart }) => {
                   padding: "10px 30px",
                   textTransform: "none",
                   fontWeight: "bold",
+                  whiteSpace: "nowrap",
                   backgroundColor: "#1e8234",
                   "&:hover": {
                     backgroundColor: "#e4312c",
                   },
                 }}
               >
-                تسوق الآن
+                عرض جميع المنتجات
               </Button>
             </Box>
           </Box>

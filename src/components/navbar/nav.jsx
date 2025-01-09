@@ -13,15 +13,18 @@ import {
   Box,
   TextField,
   styled,
-  alpha,
   InputBase,
+  Button,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import Person2Icon from "@mui/icons-material/Person2";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
-import logo from "../../image/logo.png";
+import CloseIcon from "@mui/icons-material/Close"; // Import the close icon
+import logo from "../../assets/images/logo.png";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"; // Icon for "Remove All"
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -69,6 +72,31 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
+  };
+
+  // Calculate total amount to pay
+  const totalAmount = cartItems.reduce(
+    (total, item) => total + item.salary * item.quantity,
+    0
+  );
+
+  // Remove all items from the cart
+  const removeAllItems = () => {
+    cartItems.forEach((item) => removeFromCart(item.id));
+  };
+
+  // Handle payment
+  const handlePayment = () => {
+    if (cartItems.length === 0) {
+      alert("السلة فارغة. لا يمكن إتمام الدفع.");
+      return;
+    }
+
+    // Simulate payment processing
+    alert(`تم الدفع بنجاح! المبلغ الإجمالي: ${totalAmount.toFixed(2)} $`);
+
+    // Clear the cart after successful payment
+    removeAllItems();
   };
 
   return (
@@ -206,7 +234,6 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
-                // fontWeight:"bolder"
               }}
             >
               جميع المنتجات
@@ -228,7 +255,6 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
-                // fontWeight:"bolder"
               }}
             >
               المنتجات الغذائية
@@ -250,7 +276,6 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
-                // fontWeight:"bolder"
               }}
             >
               الملابس والاكسسورات
@@ -272,7 +297,6 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 fontSize: "20px",
                 fontFamily: "Cairo",
                 color: "#000",
-                // fontWeight:"bolder"
               }}
             >
               الحرف اليدوية
@@ -280,55 +304,181 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
           </IconButton>
         </Box>
       </AppBar>
-      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer} style={{width:"120%"}}>
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        sx={{ width: cartItems.length === 0 ? "300px" : "400px" }} // Adjust width based on cart items
+        PaperProps={{
+          sx: { width: cartItems.length === 0 ? "300px" : "400px" }, // Ensure the drawer content matches the width
+        }}
+      >
         <Box sx={{ width: "100%", padding: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            السلة
-          </Typography>
+          {/* Drawer Header with Close Icon */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 2,
+            }}
+          >
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              السلة
+            </Typography>
+            <IconButton
+              onClick={toggleDrawer}
+              sx={{
+                color: "black", // Icon color
+                backgroundColor: "black", // Black background
+                borderRadius: "50%", // Circular shape
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.8)", // Slightly lighter black on hover
+                },
+              }}
+            >
+              <CloseIcon sx={{ color: "white" }} /> {/* White close icon */}
+            </IconButton>
+          </Box>
           {cartItems.length === 0 ? (
-            <Typography>السلة فارغة</Typography>
+            <Typography sx={{ textAlign: "right", fontSize: "16px", color: "text.secondary" }}>
+              السلة فارغة
+            </Typography>
           ) : (
-            <List  style={{width:"100%"}}>
-              {cartItems.map((item) => (
-                <ListItem
-                  key={item.id}
+            <>
+              {/* Remove All Button */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end", // Align button to the right
+                  marginBottom: 1, // Add space below the button
+                  padding: "8px 16px", // Add padding for better spacing
+                  borderRadius: "8px", // Rounded corners for the container
+                }}
+              >
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<DeleteSweepIcon />}
+                  onClick={removeAllItems}
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between", // Distributes elements evenly
-                    padding: "10px 0", // Adds space between items
-                    borderBottom: "1px solid #ddd", // Adds a separator between items
+                    textTransform: "none", // Prevent uppercase transformation
+                    fontWeight: "bold", // Make the text bold
+                    fontSize: "13px", // Adjust font size
+                    padding: "8px 16px", // Add padding to the button
+                    borderRadius: "20px", // Rounded corners for the button
+                    gap: "8px", // Add space between icon and text
+                    "&:hover": {
+                      backgroundColor: "#d32f2f", // Darker red on hover
+                    },
                   }}
                 >
-                  <ListItemAvatar>
-                    <Avatar src={item.image} alt={item.name} />
-                  </ListItemAvatar>
-                  <Box sx={{ flexGrow: 1, marginLeft: 2 }}>
-                    <Typography variant="subtitle1" width={"100px"}>{item.name}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      السعر: {item.salary} $
-                    </Typography>
-                  </Box>
-                  <TextField
-                    type="number"
-                    size="small"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateQuantity(item.id, parseInt(e.target.value, 10))
-                    }
-                    inputProps={{ min: 1 }}
-                    sx={{ width: 100}}
-                  />
-                  <IconButton
-                    onClick={() => removeFromCart(item.id)}
-                    color="error"
+                  إزالة الكل
+                </Button>
+              </Box>
+              {/* List of Cart Items */}
+              <List style={{ width: "100%" }}>
+                {cartItems.map((item) => (
+                  <ListItem
+                    key={item.id}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "flex-start", // Align items to the top
+                      justifyContent: "space-between",
+                      padding: "15px 0",
+                      borderBottom: "1px solid #ddd",
+                    }}
                   >
-                    إزالة
-                  </IconButton>
-                </ListItem>
-              ))}
-            </List>
+                    {/* Product Image, Name, and Price */}
+                    <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+                      {/* Product Image */}
+                      <Avatar
+                        src={item.image}
+                        alt={item.name}
+                        sx={{ width: 80, height: 80, marginRight: 3 }} // Add margin to the right of the image
+                      />
+                      {/* Product Name and Price */}
+                      <Box sx={{ textAlign: "right", marginRight: 2 }}> {/* Align text to the right */}
+                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", fontSize: "14px" }}> {/* Minimize font size */}
+                          {item.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          السعر: {item.salary} $
+                        </Typography>
+                        {/* Quantity Box */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            border: "1px solid #CECECE",
+                            borderRadius: "5px",
+                            padding: "2px",
+                            marginTop: "5px", // Add space between price and quantity box
+                            width: "fit-content", // Adjust width to fit content
+                          }}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            disabled={item.quantity <= 1} // Disable if quantity is 1
+                            sx={{
+                              color: "#1e8234",
+                              "&:hover": { backgroundColor: "#f0f0f0" },
+                            }}
+                          >
+                            -
+                          </IconButton>
+                          <Typography
+                            sx={{
+                              mx: 1,
+                              minWidth: "20px",
+                              textAlign: "center",
+                            }}
+                          >
+                            {item.quantity}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            sx={{
+                              color: "#1e8234",
+                              "&:hover": { backgroundColor: "#f0f0f0" },
+                            }}
+                          >
+                            +
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    </Box>
+                    {/* Remove Item Button */}
+                    <IconButton
+                      onClick={() => removeFromCart(item.id)}
+                      color="error"
+                      sx={{ marginLeft: 2 }} // Add space between quantity box and delete button
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItem>
+                ))}
+              </List>
+              {/* Total Amount and Pay Button */}
+              <Box sx={{ marginTop: 2 }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  onClick={handlePayment} // Handle payment on click
+                  sx={{
+                    backgroundColor: "#1e8234",
+                    "&:hover": { backgroundColor: "#15652b" },
+                    fontSize: "16px", // Adjust font size if needed
+                  }}
+                >
+                  ادفع: {totalAmount.toFixed(2)} $
+                </Button>
+              </Box>
+            </>
           )}
         </Box>
       </Drawer>
