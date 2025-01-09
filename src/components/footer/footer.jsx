@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Grid, Typography, Container } from '@mui/material';
-import mastercard from '../../image/mastercard.png'; // Replace with your actual image paths
-import visa from '../../image/visa.png';
-import paypal from '../../image/paypal.png';
-import amex from '../../image/amex.png';
+import mastercard from '../../assets/images/mastercard.png'; // Replace with your actual image paths
+import visa from '../../assets/images/visa.png';
+import paypal from '../../assets/images/paypal.png';
+import amex from '../../assets/images/amex.png';
 
 const Footer = () => {
   return (

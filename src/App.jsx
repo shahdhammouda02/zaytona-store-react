@@ -11,7 +11,7 @@ const theme = createTheme({
   },
 });
 
-function App() {
+const App = () => {
   const [cartItems, setCartItems] = useState([]);
 
   const addToCart = (item) => {
@@ -52,6 +52,6 @@ function App() {
       <Footer />
     </ThemeProvider>
   );
-}
+};
 
 export default App;
