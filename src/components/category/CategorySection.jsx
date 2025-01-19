@@ -155,9 +155,7 @@ const CategorySection = ({ addToCart }) => {
                     }}
                   />
                 </Card>
-                
               </Grid>
-              
 
               {category.items.map((item) => (
                 <Grid item xs={12} sm={6} md={3} key={item.id}>
@@ -232,13 +230,12 @@ const CategorySection = ({ addToCart }) => {
                 </Grid>
               ))}
             </Grid>
-             {/* زر تسوق الآن */}
-             <Box textAlign="center" marginBottom="20px">
+            {/* زر تسوق الآن */}
+            <Box textAlign="center" marginBottom="20px">
               <Button
                 variant="contained"
-               
                 sx={{
-                  width:"170px !important",
+                  width: "170px !important",
                   borderRadius: "50px",
                   padding: "10px 30px",
                   textTransform: "none",

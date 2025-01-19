@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Navbar from "./components/navbar/nav";
 import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
+import SelectActionCard from "./components/products/ProductsPage"; // تأكد من المسار
 import Footer from "./components/footer/footer";
-
+import Address from "./components/navbar/address/address";
 const theme = createTheme({
   typography: {
     fontFamily: "Cairo, Arial, Tahoma, sans-serif",
@@ -42,14 +44,38 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Navbar
-        cartItems={cartItems}
-        removeFromCart={removeFromCart}
-        updateQuantity={updateQuantity}
-      />
-      <Hero />
-      <CategorySection addToCart={addToCart} />
-      <Footer />
+      <Router>
+        <Navbar
+          cartItems={cartItems}
+          removeFromCart={removeFromCart}
+          updateQuantity={updateQuantity}
+        />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Hero />
+                <CategorySection addToCart={addToCart} />
+              </>
+            }
+          />
+          <Route
+            path="/select-action-card"
+            element={
+              <div
+                style={{
+                  backgroundColor: "#FCF9F6",
+                }}
+              >
+                <Address />
+                <SelectActionCard addToCart={addToCart} />
+              </div>
+            }
+          />
+        </Routes>
+        <Footer />
+      </Router>
     </ThemeProvider>
   );
 };
