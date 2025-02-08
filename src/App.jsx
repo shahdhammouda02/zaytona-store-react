@@ -6,7 +6,6 @@ import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
 import SelectActionCard from "./components/products/ProductsPage"; // تأكد من المسار
 import Footer from "./components/footer/footer";
-import Address from "./components/navbar/address/address";
 const theme = createTheme({
   typography: {
     fontFamily: "Cairo, Arial, Tahoma, sans-serif",
@@ -60,19 +59,7 @@ const App = () => {
               </>
             }
           />
-          <Route
-            path="/select-action-card"
-            element={
-              <div
-                style={{
-                  backgroundColor: "#FCF9F6",
-                }}
-              >
-                <Address />
-                <SelectActionCard addToCart={addToCart} />
-              </div>
-            }
-          />
+           <Route path="/category/:categoryName" element={<SelectActionCard   addToCart={addToCart}/>} />
         </Routes>
         <Footer />
       </Router>

@@ -1,75 +1,43 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import AppBar from "@mui/material/AppBar";
-import CssBaseline from "@mui/material/CssBaseline";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import React from "react";
+import { useParams } from "react-router-dom"; // استيراد useParams للحصول على المعرف من الرابط
+import { Box, Typography, Grid } from "@mui/material";
 
-const drawerWidth = 240;
+const CategoryProductsPage = () => {
+  const { categoryName } = useParams(); // الحصول على اسم التصنيف من الرابط
 
-export default function ClippedDrawer() {
+  // يمكنك استرجاع المنتجات الخاصة بهذا التصنيف من API أو قاعدة بيانات
+  const categoryProducts = [
+    // هنا يمكنك إضافة المنتجات الخاصة بكل تصنيف
+    { id: 1, name: "زيت الزيتون الفلسطيني الاصلي لتر واحد", salary: "5.99" },
+    { id: 2, name: "زيت الزيتون الفلسطيني الاصلي لتر واحد", salary: "5.99" },
+    { id: 3, name: "زيت الزيتون الفلسطيني الاصلي لتر واحد", salary: "5.99" },
+    // إضافة باقي المنتجات
+  ];
+
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Clipped drawer
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: "auto" }}>
-          <List>
-            {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            {["All mail", "Trash", "Spam"].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      </Drawer>
+    <Box sx={{ padding: "20px" }}>
+      <Typography variant="h4" gutterBottom>
+        {categoryName}
+      </Typography>
+      <Grid container spacing={4}>
+        {categoryProducts.map((product) => (
+          <Grid item xs={12} sm={6} md={3} key={product.id}>
+            <Box
+              sx={{
+                border: "1px solid #ddd",
+                padding: "10px",
+                borderRadius: "8px",
+                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <Typography variant="h6">{product.name}</Typography>
+              <Typography variant="body1">{product.salary} $</Typography>
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
-}
+};
+
+export default CategoryProductsPage;
