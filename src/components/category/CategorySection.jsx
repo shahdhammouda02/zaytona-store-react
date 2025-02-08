@@ -8,6 +8,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import categorybg from "../../assets/images/categorybg.jpg";
 import foodcategory from "../../assets/images/foodcategory.png";
 import clothescategory from "../../assets/images/clothescategory.png";
@@ -26,19 +27,19 @@ const CategorySection = ({ addToCart }) => {
       items: [
         {
           id: 1,
-          name: "زيت الزيتون الفلسطيني الاصلي لتر واحد",
+          name: "زيت الزيتون الفلسطيني الاصلي  ",
           image: oliveoil,
           salary: "5.99",
         },
         {
           id: 2,
-          name: "زيت الزيتون الفلسطيني الاصلي لتر واحد",
+          name: "زيت الزيتون الفلسطيني الاصلي  ",
           image: oliveoil,
           salary: "5.99",
         },
         {
           id: 3,
-          name: "زيت الزيتون الفلسطيني الاصلي لتر واحد",
+          name: "زيت الزيتون الفلسطيني الاصلي  ",
           image: oliveoil,
           salary: "5.99",
         },
@@ -232,23 +233,28 @@ const CategorySection = ({ addToCart }) => {
             </Grid>
             {/* زر تسوق الآن */}
             <Box textAlign="center" marginBottom="20px">
-              <Button
-                variant="contained"
-                sx={{
-                  width: "170px !important",
-                  borderRadius: "50px",
-                  padding: "10px 30px",
-                  textTransform: "none",
-                  fontWeight: "bold",
-                  whiteSpace: "nowrap",
-                  backgroundColor: "#1e8234",
-                  "&:hover": {
-                    backgroundColor: "#e4312c",
-                  },
-                }}
+              <Link
+                to={`/category/${category.title}`}
+                style={{ textDecoration: "none" }}
               >
-                عرض جميع المنتجات
-              </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    width: "170px !important",
+                    borderRadius: "50px",
+                    padding: "10px 30px",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    whiteSpace: "nowrap",
+                    backgroundColor: "#1e8234",
+                    "&:hover": {
+                      backgroundColor: "#e4312c",
+                    },
+                  }}
+                >
+                  عرض جميع المنتجات
+                </Button>
+              </Link>
             </Box>
           </Box>
         ))}

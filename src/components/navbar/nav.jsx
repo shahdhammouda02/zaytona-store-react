@@ -17,12 +17,13 @@ import {
   Button,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import Person2Icon from "@mui/icons-material/Person2";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close"; // Import the close icon
+
+import HighlightOffIcon from "@mui/icons-material/HighlightOff"; // Import the close icon
 import logo from "../../assets/images/logo.png";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"; // Icon for "Remove All"
 
@@ -30,9 +31,6 @@ const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: "20px",
   border: "1px solid #CECECE",
-  "&:hover": {
-    backgroundColor: "#cdcdcd",
-  },
   marginRight: theme.spacing(2),
   marginLeft: theme.spacing(2),
   width: "300px",
@@ -51,7 +49,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   color: "#CECECE",
-  right: "80%",
+  right: "88%",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -111,7 +109,12 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
             edge="start"
             color="black"
             aria-label="open drawer"
-            sx={{ mr: 2 }}
+            sx={{
+              mr: 2,
+              "&:hover": {
+                backgroundColor: "inherit !important",
+              },
+            }}
           >
             <img
               src={logo}
@@ -119,6 +122,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
               style={{ width: "135px", height: "auto" }}
             />
           </IconButton>
+
           <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
             <Search>
               <SearchIconWrapper>
@@ -137,6 +141,9 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 flexDirection: "column",
                 alignItems: "center",
                 margin: "auto",
+                "&:hover": {
+                  backgroundColor: "inherit !important",
+                },
               }}
             >
               <Person2Icon
@@ -160,6 +167,9 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 flexDirection: "column",
                 alignItems: "center",
                 margin: "auto",
+                "&:hover": {
+                  backgroundColor: "inherit !important",
+                },
               }}
             >
               <FavoriteIcon
@@ -187,11 +197,14 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 flexDirection: "column",
                 alignItems: "center",
                 margin: "auto",
+                "&:hover": {
+                  backgroundColor: "inherit !important",
+                },
               }}
               onClick={toggleDrawer}
             >
               <Badge badgeContent={cartItems.length} color="error">
-                <ShoppingCartIcon
+                <AddShoppingCartIcon
                   sx={{
                     color: "#000000",
                     fontSize: "35px",
@@ -224,6 +237,9 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
               alignContent: "center",
               paddingLeft: "20px",
               fontWeight: "bolder",
+              "&:hover": {
+                backgroundColor: "inherit !important",
+              },
             }}
           >
             <MenuIcon style={{ color: "black" }} />
@@ -246,6 +262,9 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
               alignContent: "center",
               paddingLeft: "20px",
               fontWeight: "bolder",
+              "&:hover": {
+                backgroundColor: "inherit !important",
+              },
             }}
           >
             <Typography
@@ -267,6 +286,9 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
               alignContent: "center",
               paddingLeft: "20px",
               fontWeight: "bolder",
+              "&:hover": {
+                backgroundColor: "inherit !important",
+              },
             }}
           >
             <Typography
@@ -288,6 +310,9 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
               alignContent: "center",
               paddingLeft: "20px",
               fontWeight: "bolder",
+              "&:hover": {
+                backgroundColor: "inherit !important",
+              },
             }}
           >
             <Typography
@@ -321,32 +346,47 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
               alignItems: "center",
               justifyContent: "space-between",
               marginBottom: 2,
+              marginTop: 2,
             }}
           >
+            {/* صورة بروفايل دائرية */}
+            <Avatar
+              alt="Profile Image"
+              src="/path-to-image.jpg" // استبدل هذا المسار بالصورة الخاصة بك
+              sx={{ width: 40, height: 40 }} // حجم الصورة الدائرية
+            />
             <Typography variant="h6" gutterBottom fontWeight="bold">
-              السلة
+              السلة التسوق
             </Typography>
-            <IconButton
-              onClick={toggleDrawer}
-              sx={{
-                color: "black", // Icon color
-                backgroundColor: "black", // Black background
-                borderRadius: "50%", // Circular shape
-                "&:hover": {
-                  backgroundColor: "rgba(0, 0, 0, 0.8)", // Slightly lighter black on hover
-                },
-              }}
-            >
-              <CloseIcon sx={{ color: "white" }} /> {/* White close icon */}
+
+            <IconButton onClick={toggleDrawer}>
+              <HighlightOffIcon
+                sx={{
+                  color: "black",
+                  fontSize: "35px",
+                }}
+              />
             </IconButton>
           </Box>
           {cartItems.length === 0 ? (
-            <Typography sx={{ textAlign: "right", fontSize: "16px", color: "text.secondary" }}>
+            <Typography
+              sx={{
+                textAlign: "right",
+                fontSize: "16px",
+                color: "text.secondary",
+              }}
+            >
               السلة فارغة
             </Typography>
           ) : (
-            <>
-              {/* Remove All Button */}
+            <div
+              sx
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -355,43 +395,38 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                   padding: "8px 16px", // Add padding for better spacing
                   borderRadius: "8px", // Rounded corners for the container
                 }}
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  startIcon={<DeleteSweepIcon />}
-                  onClick={removeAllItems}
-                  sx={{
-                    textTransform: "none", // Prevent uppercase transformation
-                    fontWeight: "bold", // Make the text bold
-                    fontSize: "13px", // Adjust font size
-                    padding: "8px 16px", // Add padding to the button
-                    borderRadius: "20px", // Rounded corners for the button
-                    gap: "8px", // Add space between icon and text
-                    "&:hover": {
-                      backgroundColor: "#d32f2f", // Darker red on hover
-                    },
-                  }}
-                >
-                  إزالة الكل
-                </Button>
-              </Box>
+              ></Box>
+
               {/* List of Cart Items */}
-              <List style={{ width: "100%" }}>
+              <List
+                style={{
+                  width: "100%",
+                  alignItems: "center !important",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 {cartItems.map((item) => (
                   <ListItem
                     key={item.id}
                     sx={{
+                      alignItems: "center !important",
                       display: "flex",
                       flexDirection: "row",
-                      alignItems: "flex-start", // Align items to the top
                       justifyContent: "space-between",
                       padding: "15px 0",
                       borderBottom: "1px solid #ddd",
                     }}
                   >
                     {/* Product Image, Name, and Price */}
-                    <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+                    <Box
+                      sx={{
+                        alignItems: "center !important",
+                        display: "flex",
+                        flexGrow: 1,
+                        alignItems: "center",
+                      }}
+                    >
                       {/* Product Image */}
                       <Avatar
                         src={item.image}
@@ -399,8 +434,11 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                         sx={{ width: 80, height: 80, marginRight: 3 }} // Add margin to the right of the image
                       />
                       {/* Product Name and Price */}
-                      <Box sx={{ textAlign: "right", marginRight: 2 }}> {/* Align text to the right */}
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", fontSize: "14px" }}> {/* Minimize font size */}
+                      <Box sx={{ textAlign: "right", marginRight: 2 }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: "bold", fontSize: "14px" }}
+                        >
                           {item.name}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -420,11 +458,15 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                         >
                           <IconButton
                             size="small"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity - 1)
+                            }
                             disabled={item.quantity <= 1} // Disable if quantity is 1
                             sx={{
                               color: "#1e8234",
-                              "&:hover": { backgroundColor: "#f0f0f0" },
+                              "&:hover": {
+                                backgroundColor: "inherit !important",
+                              },
                             }}
                           >
                             -
@@ -440,10 +482,14 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                           </Typography>
                           <IconButton
                             size="small"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity + 1)
+                            }
                             sx={{
                               color: "#1e8234",
-                              "&:hover": { backgroundColor: "#f0f0f0" },
+                              "&:hover": {
+                                backgroundColor: "inherit !important",
+                              },
                             }}
                           >
                             +
@@ -455,15 +501,21 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                     <IconButton
                       onClick={() => removeFromCart(item.id)}
                       color="error"
-                      sx={{ marginLeft: 2 }} // Add space between quantity box and delete button
+                      sx={{
+                        marginLeft: 2,
+                        "&:hover": {
+                          backgroundColor: "inherit !important",
+                        },
+                      }} // Add space between quantity box and delete button
                     >
                       <DeleteIcon />
                     </IconButton>
                   </ListItem>
                 ))}
               </List>
+
               {/* Total Amount and Pay Button */}
-              <Box sx={{ marginTop: 2 }}>
+              <Box sx={{ marginTop: 2, width: "80%" }}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -471,14 +523,32 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                   onClick={handlePayment} // Handle payment on click
                   sx={{
                     backgroundColor: "#1e8234",
-                    "&:hover": { backgroundColor: "#15652b" },
-                    fontSize: "16px", // Adjust font size if needed
+                    fontSize: "16px",
+                    borderRadius: "20px",
+                    marginBottom: "20px", // Adjust font size if needed
                   }}
                 >
                   ادفع: {totalAmount.toFixed(2)} $
                 </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<DeleteSweepIcon />}
+                  onClick={removeAllItems}
+                  sx={{
+                    textTransform: "none", // Prevent uppercase transformation
+                    fontWeight: "bold", // Make the text bold
+                    fontSize: "13px", // Adjust font size
+                    padding: "8px 16px", // Add padding to the button
+                    borderRadius: "20px", // Rounded corners for the button
+                    gap: "8px", // Add space between icon and text
+                    width: "100%",
+                  }}
+                >
+                  إزالة الكل
+                </Button>
               </Box>
-            </>
+            </div>
           )}
         </Box>
       </Drawer>
