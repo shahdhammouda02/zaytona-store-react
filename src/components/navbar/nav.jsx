@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -67,6 +68,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -95,6 +97,11 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
 
     // Clear the cart after successful payment
     removeAllItems();
+  };
+
+  // Handle login redirection
+  const handleLoginClick = () => {
+    navigate("/login");
   };
 
   return (
@@ -136,6 +143,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
+              onClick={handleLoginClick}
               sx={{
                 display: "flex",
                 flexDirection: "column",
