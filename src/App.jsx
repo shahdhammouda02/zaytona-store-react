@@ -1,19 +1,22 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Navbar from "./components/navbar/nav";
 import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
-import SelectActionCard from "./components/products/ProductsPage"; // تأكد من المسار
+import SelectActionCard from "./components/products/ProductsPage"; 
 import Footer from "./components/footer/footer";
+import SignIn from "./components/login-logout/logoin";
+
 const theme = createTheme({
   typography: {
     fontFamily: "Cairo, Arial, Tahoma, sans-serif",
   },
 });
 
-const App = () => {
+const AppContent = () => {
   const [cartItems, setCartItems] = useState([]);
+  const location = useLocation(); // 🔹 تحديد الصفحة الحالية
 
   const addToCart = (item) => {
     setCartItems((prev) => {
@@ -41,30 +44,39 @@ const App = () => {
     );
   };
 
+  const isLoginPage = location.pathname === "/login"; // 🔹 التحقق إذا كان المستخدم في صفحة تسجيل الدخول
+
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Navbar
-          cartItems={cartItems}
-          removeFromCart={removeFromCart}
-          updateQuantity={updateQuantity}
+    <>
+      {!isLoginPage && (
+        <Navbar cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />
+      )}
+      
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero />
+              <CategorySection addToCart={addToCart} />
+            </>
+          }
         />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Hero />
-                <CategorySection addToCart={addToCart} />
-              </>
-            }
-          />
-           <Route path="/category/:categoryName" element={<SelectActionCard   addToCart={addToCart}/>} />
-        </Routes>
-        <Footer />
-      </Router>
-    </ThemeProvider>
+        <Route path="/category/:categoryName" element={<SelectActionCard addToCart={addToCart} />} />
+        <Route path="/login" element={<SignIn />} />
+      </Routes>
+
+      {!isLoginPage && <Footer />}
+    </>
   );
 };
+
+const App = () => (
+  <ThemeProvider theme={theme}>
+    <Router>
+      <AppContent />
+    </Router>
+  </ThemeProvider>
+);
 
 export default App;
