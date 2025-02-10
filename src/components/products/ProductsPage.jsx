@@ -1,7 +1,6 @@
 import * as React from "react";
 import oliveoil from "../../assets/images/oliveoil.png";
 import {
-  Grid,
   Typography,
   Card,
   CardContent,
