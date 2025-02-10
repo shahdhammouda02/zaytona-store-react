@@ -7,6 +7,7 @@ import CategorySection from "./components/category/CategorySection";
 import SelectActionCard from "./components/products/ProductsPage"; 
 import Footer from "./components/footer/footer";
 import SignIn from "./components/login-logout/logoin";
+import SignUp from "./components/login-logout/SignUp";
 
 const theme = createTheme({
   typography: {
@@ -64,6 +65,7 @@ const AppContent = () => {
         />
         <Route path="/category/:categoryName" element={<SelectActionCard addToCart={addToCart} />} />
         <Route path="/login" element={<SignIn />} />
+        <Route path="/register" element={<SignUp />} />
       </Routes>
 
       {!isLoginPage && <Footer />}
