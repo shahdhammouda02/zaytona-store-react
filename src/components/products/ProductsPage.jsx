@@ -1,5 +1,5 @@
 import * as React from "react";
-import oliveoil from "../../assets/images/oliveoil.png";
+import { useLocation } from "react-router-dom";
 import {
   Typography,
   Card,
@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 
 function SelectActionCard({ addToCart }) {
+  const location = useLocation();
   const [openCategory, setOpenCategory] = React.useState(null);
 
   // Toggle category open/close
@@ -23,12 +24,7 @@ function SelectActionCard({ addToCart }) {
     setOpenCategory(openCategory === index ? null : index);
   };
 
-  const cards = Array.from({ length: 15 }, (_, index) => ({
-    id: index + 1,
-    name: "زيت الزيتون الفلسطيني الاصلي لتر واحد",
-    image: oliveoil,
-    salary: "5.99",
-  }));
+  const products = location.state?.products || [];
 
   const categories = [
     {
@@ -129,7 +125,7 @@ function SelectActionCard({ addToCart }) {
             width: "100%",
             padding: "16px",
             margin: "0 auto",
-            textAlign: "righ",
+            textAlign: "right",
             display: "block",
           }}
         >
@@ -140,9 +136,10 @@ function SelectActionCard({ addToCart }) {
               fontWeight: "bold",
               color: "#34495e",
               marginBottom: "16px",
+              direction: "rtl", // النص من اليمين لليسار
             }}
           >
-           الرئيسية  &lt; جميع المنتجات &lt; المنتجات الغذائية
+            الرئيسية &gt; جميع المنتجات &gt; المنتجات الغذائية
           </Typography>
         </Box>
         <Box
@@ -161,9 +158,9 @@ function SelectActionCard({ addToCart }) {
             gap: 2,
           }}
         >
-          {cards.map((card) => (
+          {products.map((product) => (
             <Card
-              key={card.id}
+              key={product.id}
               sx={{
                 maxWidth: 240,
                 margin: "0 auto",
@@ -179,8 +176,8 @@ function SelectActionCard({ addToCart }) {
               <CardMedia
                 component="img"
                 height="160"
-                image={card.image}
-                alt={card.name}
+                image={product.image}
+                alt={product.name}
                 sx={{
                   objectFit: "contain",
                   padding: "10px",
@@ -198,7 +195,7 @@ function SelectActionCard({ addToCart }) {
                     color: "#34495e",
                   }}
                 >
-                  {card.name}
+                  {product.name}
                 </Typography>
                 <Typography
                   variant="h6"
@@ -208,13 +205,13 @@ function SelectActionCard({ addToCart }) {
                     textAlign: "center",
                   }}
                 >
-                  {card.salary} $
+                  {product.salary} $
                 </Typography>
                 <Box textAlign="center" mt={2}>
                   <Button
                     variant="contained"
                     color="success"
-                    onClick={() => addToCart(card)}
+                    onClick={() => addToCart(product)}
                     sx={{
                       borderRadius: "50px",
                       padding: "8px 20px",
