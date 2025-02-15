@@ -1,12 +1,28 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Box, Button, TextField, Typography, Stack, CssBaseline, Divider, FormControlLabel, Checkbox, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Stack,
+  CssBaseline,
+  Divider,
+  FormControlLabel,
+  Checkbox,
+  IconButton,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import MuiCard from "@mui/material/Card";
-import AppTheme from "./components/AppTheme"; 
+import AppTheme from "./components/AppTheme";
 import ColorModeSelect from "./components/ColorModeSelect";
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./components/CustomIcons"; 
+import {
+  GoogleIcon,
+  FacebookIcon,
+  SitemarkIcon,
+} from "./components/CustomIcons";
+import Bg from "../../assets/images/bg.png"; // تأكد من المسار الصحيح للصورة
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -22,8 +38,9 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
+  backgroundImage: `url(${Bg})`, // استخدام الخلفية
+  backgroundSize: "cover",
+  backgroundPosition: "center",
   minHeight: "100vh",
   height: "100%",
   padding: theme.spacing(2),
@@ -41,7 +58,10 @@ const SignIn = () => {
   useEffect(() => {
     const savedCredentials = JSON.parse(localStorage.getItem("rememberedUser"));
     if (savedCredentials) {
-      setFormData({ email: savedCredentials.email, password: savedCredentials.password });
+      setFormData({
+        email: savedCredentials.email,
+        password: savedCredentials.password,
+      });
       setRememberMe(true);
     }
   }, []);
@@ -56,7 +76,8 @@ const SignIn = () => {
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const matchedUser = users.find(
-      (user) => user.email === formData.email && user.password === formData.password
+      (user) =>
+        user.email === formData.email && user.password === formData.password
     );
 
     if (matchedUser) {
@@ -64,7 +85,10 @@ const SignIn = () => {
       localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
 
       if (rememberMe) {
-        localStorage.setItem("rememberedUser", JSON.stringify({ email: formData.email, password: formData.password }));
+        localStorage.setItem(
+          "rememberedUser",
+          JSON.stringify({ email: formData.email, password: formData.password })
+        );
       } else {
         localStorage.removeItem("rememberedUser");
       }
@@ -76,29 +100,82 @@ const SignIn = () => {
   };
 
   return (
-    <AppTheme>
+    <AppTheme background={Bg}>
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
-        <ColorModeSelect sx={{ position: "fixed", top: "1rem", right: "1rem" }} />
+        <ColorModeSelect
+          sx={{ position: "fixed", top: "1rem", right: "1rem" }}
+        />
         <Card variant="outlined">
-          <Box sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}>
+          <Box
+            sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}
+          >
             <SitemarkIcon />
           </Box>
-          <Typography component="h1" variant="h4" sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}>
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+          >
             تسجيل الدخول
           </Typography>
-          {error && <Typography color="error" sx={{ textAlign: "center" }}>{error}</Typography>}
-          <Box component="form" onSubmit={handleSignIn} noValidate sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 2 }}>
-            <TextField label="البريد الإلكتروني" name="email" fullWidth margin="normal" value={formData.email} onChange={handleChange} required error={!!error} />
-            <TextField label="كلمة المرور" name="password" fullWidth margin="normal" type="password" value={formData.password} onChange={handleChange} required error={!!error} />
-            
-            <FormControlLabel 
-              control={<Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
+          {error && (
+            <Typography color="error" sx={{ textAlign: "center" }}>
+              {error}
+            </Typography>
+          )}
+          <Box
+            component="form"
+            onSubmit={handleSignIn}
+            noValidate
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <TextField
+              label="البريد الإلكتروني"
+              name="email"
+              fullWidth
+              margin="normal"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              error={!!error}
+              InputLabelProps={{
+                style: { textAlign: "right !important" }, // محاذاة العنوان إلى اليمين
+              }}
+              InputProps={{
+                style: { textAlign: "right" }, // محاذاة النص داخل حقل الإدخال إلى اليمين
+              }}
+            />
+            <TextField
+              label="كلمة المرور"
+              name="password"
+              fullWidth
+              margin="normal"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              error={!!error}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+              }
               label="تذكرني"
             />
-
-            <Button type="submit" variant="contained" fullWidth>تسجيل الدخول</Button>
-            <Link component="button" variant="body2" sx={{ alignSelf: "center", marginTop: 2 }}>هل نسيت كلمة المرور؟</Link>
+            <Button type="submit" variant="contained" fullWidth>
+              تسجيل الدخول
+            </Button>
+            <Link
+              component="button"
+              variant="body2"
+              sx={{ alignSelf: "center", marginTop: 2 }}
+            >
+              هل نسيت كلمة المرور؟
+            </Link>
           </Box>
           <Divider sx={{ margin: "16px 0" }}>أو تسجيل الدخول بواسطة:</Divider>
           <Stack direction="row" spacing={2} justifyContent="center">
@@ -111,7 +188,9 @@ const SignIn = () => {
           </Stack>
           <Typography sx={{ textAlign: "center", marginTop: 2 }}>
             ليس لديك حساب؟{" "}
-            <Link to="/register" variant="body2">إنشاء حساب جديد</Link>
+            <Link to="/register" variant="body2">
+              إنشاء حساب جديد
+            </Link>
           </Typography>
         </Card>
       </SignInContainer>

@@ -1,43 +1,55 @@
 import React from "react";
-import { useParams } from "react-router-dom"; // استيراد useParams للحصول على المعرف من الرابط
-import { Box, Typography, Grid } from "@mui/material";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Grid, Typography, Card, CardContent, CardMedia, Box, Button } from "@mui/material";
 
-const CategoryProductsPage = () => {
-  const { categoryName } = useParams(); // الحصول على اسم التصنيف من الرابط
+const ProductsPage = () => {
+  const { category } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // يمكنك استرجاع المنتجات الخاصة بهذا التصنيف من API أو قاعدة بيانات
-  const categoryProducts = [
-    // هنا يمكنك إضافة المنتجات الخاصة بكل تصنيف
-    { id: 1, name: "زيت الزيتون الفلسطيني الاصلي لتر واحد", salary: "5.99" },
-    { id: 2, name: "زيت الزيتون الفلسطيني الاصلي لتر واحد", salary: "5.99" },
-    { id: 3, name: "زيت الزيتون الفلسطيني الاصلي لتر واحد", salary: "5.99" },
-    // إضافة باقي المنتجات
-  ];
+  // استقبال المنتجات المرسلة من CategorySection.js
+  const products = location.state?.products || [];
 
   return (
-    <Box sx={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
-        {categoryName}
+    <Box sx={{ padding: "40px", minHeight: "100vh", backgroundColor: "#f9f9f9" }}>
+      <Typography variant="h4" textAlign="center" fontWeight="bold" sx={{ marginBottom: "20px", color: "#2c3e50" }}>
+        {category ? `منتجات ${category}` : "جميع المنتجات"}
       </Typography>
-      <Grid container spacing={4}>
-        {categoryProducts.map((product) => (
-          <Grid item xs={12} sm={6} md={3} key={product.id}>
-            <Box
-              sx={{
-                border: "1px solid #ddd",
-                padding: "10px",
-                borderRadius: "8px",
-                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <Typography variant="h6">{product.name}</Typography>
-              <Typography variant="body1">{product.salary} $</Typography>
-            </Box>
-          </Grid>
-        ))}
+
+      <Grid container spacing={4} justifyContent="center">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <Grid item xs={12} sm={6} md={4} key={product.id}>
+              <Card sx={{ maxWidth: 240, margin: "0 auto", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
+                <CardMedia component="img" height="160" image={product.image} alt={product.name} sx={{ objectFit: "contain", padding: "10px" }} />
+                <CardContent>
+                  <Typography variant="body1" fontWeight="bold" textAlign="center" sx={{ color: "#34495e" }}>
+                    {product.name}
+                  </Typography>
+                  <Typography variant="h6" textAlign="center" sx={{ color: "#555" }}>{product.salary} $</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="h6" textAlign="center" sx={{ color: "#e74c3c", marginTop: "20px" }}>
+            لا توجد منتجات في هذا القسم.
+          </Typography>
+        )}
       </Grid>
+
+      <Box textAlign="center" marginTop="30px">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/products")}
+          sx={{ borderRadius: "50px", padding: "10px 30px", textTransform: "none", fontWeight: "bold", backgroundColor: "#1e8234", "&:hover": { backgroundColor: "#e4312c" } }}
+        >
+          عرض جميع المنتجات
+        </Button>
+      </Box>
     </Box>
   );
 };
 
-export default CategoryProductsPage;
+export default ProductsPage;

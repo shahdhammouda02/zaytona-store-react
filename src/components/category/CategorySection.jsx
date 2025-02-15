@@ -43,24 +43,48 @@ const CategorySection = ({ addToCart }) => {
           image: oliveoil,
           salary: "5.99",
         },
+        {
+          id: 4,
+          name: "زيت الزيتون الفلسطيني الاصلي  ",
+          image: oliveoil,
+          salary: "5.99",
+        },
+        {
+          id: 5,
+          name: "زيت الزيتون الفلسطيني الاصلي  ",
+          image: oliveoil,
+          salary: "5.99",
+        },
+        {
+          id: 6,
+          name: "زيت الزيتون الفلسطيني الاصلي  ",
+          image: oliveoil,
+          salary: "5.99",
+        },
       ],
     },
     {
       title: "الملابس والاكسسوارات",
       banner: clothescategory,
       items: [
-        { id: 4, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
-        { id: 5, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
-        { id: 6, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
+        { id: 7, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
+        { id: 8, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
+        { id: 9, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
+        { id: 10, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
+        { id: 11, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
+        { id: 12, name: "ثوب فلاحي فلسطيني", image: dress, salary: "20.99" },
       ],
     },
     {
       title: "الحرف اليدوية",
       banner: handcraftescategory,
       items: [
-        { id: 7, name: "زبدية فخار", image: craft, salary: "3.99" },
-        { id: 8, name: "زبدية فخار", image: craft, salary: "3.99" },
-        { id: 9, name: "زبدية فخار", image: craft, salary: "3.99" },
+        { id: 13, name: "زبدية فخار", image: craft, salary: "3.99" },
+        { id: 14, name: "زبدية فخار", image: craft, salary: "3.99" },
+        { id: 15, name: "زبدية فخار", image: craft, salary: "3.99" },
+        { id: 16, name: "زبدية فخار", image: craft, salary: "3.99" },
+        { id: 17, name: "زبدية فخار", image: craft, salary: "3.99" },
+        { id: 18, name: "زبدية فخار", image: craft, salary: "3.99" },
       ],
     },
     {
@@ -68,19 +92,37 @@ const CategorySection = ({ addToCart }) => {
       banner: bookscategory,
       items: [
         {
-          id: 10,
+          id: 19,
           name: "رواية الطنطورية للكاتبة رضوى عاشور",
           image: books,
           salary: "5.99",
         },
         {
-          id: 11,
+          id: 20,
           name: "رواية الطنطورية للكاتبة رضوى عاشور",
           image: books,
           salary: "5.99",
         },
         {
-          id: 12,
+          id: 21,
+          name: "رواية الطنطورية للكاتبة رضوى عاشور",
+          image: books,
+          salary: "5.99",
+        },
+        {
+          id: 22,
+          name: "رواية الطنطورية للكاتبة رضوى عاشور",
+          image: books,
+          salary: "5.99",
+        },
+        {
+          id: 23,
+          name: "رواية الطنطورية للكاتبة رضوى عاشور",
+          image: books,
+          salary: "5.99",
+        },
+        {
+          id: 24,
           name: "رواية الطنطورية للكاتبة رضوى عاشور",
           image: books,
           salary: "5.99",
@@ -158,7 +200,7 @@ const CategorySection = ({ addToCart }) => {
                 </Card>
               </Grid>
 
-              {category.items.map((item) => (
+              {category.items.slice(0, 3).map((item) => (
                 <Grid item xs={12} sm={6} md={3} key={item.id}>
                   <Card
                     sx={{
@@ -235,6 +277,7 @@ const CategorySection = ({ addToCart }) => {
             <Box textAlign="center" marginBottom="20px">
               <Link
                 to={`/category/${category.title}`}
+                state={{ products: category.items }}
                 style={{ textDecoration: "none" }}
               >
                 <Button
