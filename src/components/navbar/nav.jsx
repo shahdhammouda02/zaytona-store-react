@@ -139,7 +139,14 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
             />
           </IconButton>
 
-          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" ,height:"45px"}}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              justifyContent: "center",
+              height: "45px",
+            }}
+          >
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -151,14 +158,19 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 onInputChange={(event, newValue) => setSearchTerm(newValue)}
                 renderInput={(params) => (
                   <TextField
-                    sx={{
-                      "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                      padding: "0.5px 4px 7.5px 5px",
-                    }}
                     {...params}
                     variant="outlined"
                     placeholder="ما الذي تبحث عنه ...."
                     fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": { border: "none" }, // إزالة الحدود
+                      "& .MuiOutlinedInput-root": {
+                        padding: "0px 10px", // إزالة أي مسافات إضافية حول الإدخال
+                        // لون خلفية خفيف لمزيد من الجمالية
+                        borderRadius: "10px", // تدوير الحواف
+                      },
+                    }}
+                  
                   />
                 )}
               />
