@@ -14,6 +14,8 @@ import {
   styled,
   InputBase,
   Button,
+  Menu,
+  MenuItem
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -27,14 +29,32 @@ import logo from "../../assets/images/logo.png";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { Autocomplete, TextField } from "@mui/material";
 const searchSuggestions = [
-  "هاتف سامسونج",
-  "لابتوب ديل",
-  "ساعة ذكية",
-  "كاميرا احترافية",
-  "سماعات بلوتوث",
+  "زيت الزيتون",
+  "كوفية",
+  "ثوب فلاحي",
+  "ميدالية",
   "منتجات غذائية",
   "ملابس رياضية",
   "حرف يدوية",
+];
+
+const categories = [
+  {
+    name: "المنتجات الغذائية",
+    subcategories: ["المشروبات", "الاكل الفلسطيني", "الزيوت"],
+  },
+  {
+    name: "الملابس والاكسسوارات",
+    subcategories: ["الاكسسوارات", "الملابس الرجالية", "الملابس النسائية"],
+  },
+  {
+    name: "الحرف اليدوية",
+    subcategories: ["فخار", "أطباق", "ميدالية"],
+  },
+  {
+    name: "الكتب والمطبوعات",
+    subcategories: ["القصص", "الروايات", "الصحف والمجلات"],
+  },
 ];
 
 const Search = styled("div")(({ theme }) => ({
@@ -118,6 +138,19 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
     }
   };
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [currentCategory, setCurrentCategory] = useState(null);
+
+  const handleClick = (event, category) => {
+    setAnchorEl(event.currentTarget);
+    setCurrentCategory(category);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setCurrentCategory(null);
+  };
+  
   return (
     <>
       <AppBar
@@ -125,6 +158,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
         sx={{ backgroundColor: "white", paddingTop: "20px" }}
       >
         <Toolbar>
+          <Link to="/">
           <IconButton
             size="large"
             edge="start"
@@ -138,6 +172,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
               style={{ width: "135px", height: "auto" }}
             />
           </IconButton>
+          </Link>
 
           <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" ,height:"45px"}}>
             <Search>
@@ -266,119 +301,78 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
           </Box>
         </Toolbar>
 
-        <Box
-          sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}
+        <Box sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}>
+      <Link to="/products" style={{ textDecoration: "none", color: "inherit" }}>
+        <IconButton
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            paddingLeft: "20px",
+            fontWeight: "bolder",
+            "&:hover": { backgroundColor: "inherit !important" },
+          }}
         >
-          <Link
-            to="/products"
-            style={{ textDecoration: "none", color: "inherit" }}
+          <MenuIcon style={{ color: "black" }} />
+          <Typography
+            style={{
+              margin: 0,
+              padding: 0,
+              fontSize: "20px",
+              fontFamily: "Cairo",
+              color: "#000",
+            }}
           >
-            <IconButton
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignContent: "center",
-                paddingLeft: "20px",
-                fontWeight: "bolder",
-                "&:hover": { backgroundColor: "inherit !important" },
+            جميع المنتجات
+          </Typography>
+        </IconButton>
+      </Link>
+
+      {categories.map((category, index) => (
+        <div key={index}>
+          <IconButton
+            onClick={(event) => handleClick(event, category)}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              paddingLeft: "20px",
+              fontWeight: "bolder",
+              "&:hover": { backgroundColor: "inherit !important" },
+            }}
+          >
+            <Typography
+              style={{
+                margin: 0,
+                padding: 0,
+                fontSize: "20px",
+                fontFamily: "Cairo",
+                color: "#000",
               }}
             >
-              <MenuIcon style={{ color: "black" }} />
-              <Typography
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  fontSize: "20px",
-                  fontFamily: "Cairo",
-                  color: "#000",
-                }}
-              >
-                جميع المنتجات
-              </Typography>
-            </IconButton>
-          </Link>
-          <Link
-            to="/products?category=food"
-            style={{ textDecoration: "none", color: "inherit" }}
+              {category.name}
+            </Typography>
+          </IconButton>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl) && currentCategory?.name === category.name}
+            onClose={handleClose}
           >
-            <IconButton
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignContent: "center",
-                paddingLeft: "20px",
-                fontWeight: "bolder",
-                "&:hover": { backgroundColor: "inherit !important" },
-              }}
-            >
-              <Typography
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  fontSize: "20px",
-                  fontFamily: "Cairo",
-                  color: "#000",
-                }}
-              >
-                المنتجات الغذائية
-              </Typography>
-            </IconButton>
-          </Link>
-          <Link
-            to="/products?category=clothing"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <IconButton
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignContent: "center",
-                paddingLeft: "20px",
-                fontWeight: "bolder",
-                "&:hover": { backgroundColor: "inherit !important" },
-              }}
-            >
-              <Typography
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  fontSize: "20px",
-                  fontFamily: "Cairo",
-                  color: "#000",
-                }}
-              >
-                الملابس والاكسسورات
-              </Typography>
-            </IconButton>
-          </Link>
-          <Link
-            to="/products?category=crafts"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <IconButton
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignContent: "center",
-                paddingLeft: "20px",
-                fontWeight: "bolder",
-                "&:hover": { backgroundColor: "inherit !important" },
-              }}
-            >
-              <Typography
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  fontSize: "20px",
-                  fontFamily: "Cairo",
-                  color: "#000",
-                }}
-              >
-                الحرف اليدوية
-              </Typography>
-            </IconButton>
-          </Link>
-        </Box>
+            {currentCategory?.subcategories.map((subcategory, subIndex) => (
+              <MenuItem key={subIndex} onClick={handleClose}>
+                <Link
+                  to={`/category/${currentCategory.name}?subcategory=${subcategory}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  {subcategory}
+                </Link>
+              </MenuItem>
+            ))}
+          </Menu>
+        </div>
+      ))}
+    </Box>
       </AppBar>
 
       <Drawer
