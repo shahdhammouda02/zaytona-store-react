@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   Typography,
   Card,
@@ -25,22 +25,24 @@ function SelectActionCard({ addToCart }) {
   };
 
   const products = location.state?.products || [];
+  const { categoryName } = useParams(); 
+  const categoryTitle = categoryName || "جميع المنتجات";
 
   const categories = [
     {
-      name: "الزيوت",
-      subcategories: ["زيت الزيتون", "زيت الطهي", "زيت جوز الهند"],
+      name: "المنتجات الغذائية",
+      subcategories: ["المشروبات", "الاكل الفلسطيني", "الزيوت"],
     },
-    { name: "الملابس", subcategories: ["تي شيرتات", "جاكيتات", "بنطلونات"] },
-    { name: "الأواني المنزلية", subcategories: ["ملاعق", "أطباق", "أكواب"] },
+    { name: "الملابس والاكسسوارات", subcategories: ["الاكسسوارات", "الملابس الرجالية", "الملابس النسائية"] },
+    { name: "الحرف اليدوية", subcategories: ["فخار", "أطباق", "ميدالية"] },
     {
-      name: "منتجات يدوية",
-      subcategories: ["سلات يدوية", "تحف يدوية", "مجوهرات يدوية"],
+      name: "الكتب والمطبوعات",
+      subcategories: ["القصص", "الروايات", "الصحف والمجلات"],
     },
-    {
-      name: "منتجات فلسطينية",
-      subcategories: ["منتجات زيتون", "منتجات التمور", "منتجات حرفية"],
-    },
+    // {
+    //   name: "منتجات فلسطينية",
+    //   subcategories: ["منتجات زيتون", "منتجات التمور", "منتجات حرفية"],
+    // },
   ];
 
   return (
@@ -139,7 +141,7 @@ function SelectActionCard({ addToCart }) {
               direction: "rtl", // النص من اليمين لليسار
             }}
           >
-            الرئيسية &gt; جميع المنتجات &gt; المنتجات الغذائية
+            الرئيسية &gt; جميع المنتجات &gt; {categoryName}
           </Typography>
         </Box>
         <Box
