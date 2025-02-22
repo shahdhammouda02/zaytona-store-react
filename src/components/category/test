@@ -1,0 +1,66 @@
+import React, { useEffect } from "react";
+
+const CategorySection = ({ updateCategories }) => {
+  const categories = ["Electronics", "Fashion", "Home", "Books"];
+
+  // عندما يتم تحميل المكون، نقوم بتحديث الفئات في App.js
+  useEffect(() => {
+    updateCategories(categories);
+  }, [updateCategories]);
+
+  return (
+    <div>
+      <h1>Categories</h1>
+      {/* هنا يمكنك عرض محتوى الفئات أو أشياء أخرى */}
+    </div>
+  );
+};
+
+export default CategorySection;
+
+
+
+import React, { useState } from "react";
+import CategorySection from "./components/category/CategorySection"; // تأكد من المسار الصحيح للمكون
+import Navbar from "./components/navbar/nav";
+const App = () => {
+  const [categories, setCategories] = useState([]); // حفظ الفئات في الحالة
+
+  // دالة لتحديث الفئات من CategorySection
+  const updateCategories = (categories) => {
+    setCategories(categories);
+  };
+
+  return (
+    <div>
+      {/* تمرير دالة updateCategories إلى CategorySection لتحديث الفئات */}
+      <CategorySection updateCategories={updateCategories} />
+      
+      {/* تمرير categories إلى Navbar لعرض الفئات */}
+      <Navbar categories={categories} />
+    </div>
+  );
+};
+
+export default App;
+
+
+
+
+
+import React from 'react';
+
+const Navbar = ({ categories }) => {
+  return (
+    <nav>
+      <ul>
+        {categories.map((category, index) => (
+          <li key={index}>{category}</li>
+        ))}
+      </ul>
+    </nav>
+  );
+};
+
+export default Navbar;
+

@@ -38,24 +38,6 @@ const searchSuggestions = [
   "حرف يدوية",
 ];
 
-const categories = [
-  {
-    name: "المنتجات الغذائية",
-    subcategories: ["المشروبات", "الاكل الفلسطيني", "الزيوت"],
-  },
-  {
-    name: "الملابس والاكسسوارات",
-    subcategories: ["الاكسسوارات", "الملابس الرجالية", "الملابس النسائية"],
-  },
-  {
-    name: "الحرف اليدوية",
-    subcategories: ["فخار", "أطباق", "ميدالية"],
-  },
-  {
-    name: "الكتب والمطبوعات",
-    subcategories: ["القصص", "الروايات", "الصحف والمجلات"],
-  },
-];
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -91,7 +73,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
+const Navbar = ({ cartItems, updateQuantity, removeFromCart, categories = [] }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("authToken")
@@ -100,14 +82,9 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("authToken"));
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+    console.log("Categories fetched:", categories);
+  }, [categories]);
+  
 
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
@@ -302,7 +279,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
         </Toolbar>
 
         <Box sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}>
-      <Link to="/products" style={{ textDecoration: "none", color: "inherit" }}>
+      <Link to="/products/" style={{ textDecoration: "none", color: "inherit" }}>
         <IconButton
           sx={{
             display: "flex",
@@ -350,7 +327,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
                 color: "#000",
               }}
             >
-              {category.name}
+              {category.title}
             </Typography>
           </IconButton>
 

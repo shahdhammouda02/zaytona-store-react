@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Navbar from "./components/navbar/nav";
 import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
-import SelectActionCard from "./components/products/ProductsPage"; 
+import SelectActionCard from "./components/products/ProductsPage";
 import Footer from "./components/footer/footer";
 import SignIn from "./components/login-logout/logoin";
 import SignUp from "./components/login-logout/SignUp";
@@ -17,7 +23,14 @@ const theme = createTheme({
 
 const AppContent = () => {
   const [cartItems, setCartItems] = useState([]);
-  const location = useLocation(); // 🔹 تحديد الصفحة الحالية
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  const updateCategories = (categories) => {
+    setCategories(categories);
+  };
 
   const addToCart = (item) => {
     setCartItems((prev) => {
@@ -45,25 +58,50 @@ const AppContent = () => {
     );
   };
 
-  const isLoginPage = location.pathname === "/login"; // 🔹 التحقق إذا كان المستخدم في صفحة تسجيل الدخول
+  const isLoginPage =
+    location.pathname === "/login" || location.pathname === "/register";
+
+  const navigateToCategory = (categoryName, products) => {
+    setProducts(products);
+    navigate(`/category/${categoryName}`, { state: { products } });
+  };
 
   return (
     <>
       {!isLoginPage && (
-        <Navbar cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />
+        <Navbar
+          cartItems={cartItems}
+          updateQuantity={updateQuantity}
+          removeFromCart={removeFromCart}
+          categories={categories}
+        />
       )}
-      
+
       <Routes>
         <Route
           path="/"
           element={
             <>
               <Hero />
-              <CategorySection addToCart={addToCart} />
+              <CategorySection
+                addToCart={addToCart}
+                updateCategories={updateCategories}
+                navigateToCategory={navigateToCategory}
+              />
             </>
           }
         />
-        <Route path="/category/:categoryName" element={<SelectActionCard addToCart={addToCart} />} />
+        <Route
+          path="/category/:categoryName"
+          element={
+            <SelectActionCard
+              addToCart={addToCart}
+              categories={categories}
+              products={location.state?.products || []}
+            />
+          }
+        />
+
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
       </Routes>
