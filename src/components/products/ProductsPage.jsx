@@ -1,5 +1,7 @@
 import * as React from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { categories } from "../data/data";
+import { Link } from "react-router-dom";
 import {
   Typography,
   Card,
@@ -12,50 +14,28 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
-  Collapse,
 } from "@mui/material";
 
 function SelectActionCard({ addToCart }) {
-  const location = useLocation();
-  const [openCategory, setOpenCategory] = React.useState(null);
+  const { categoryName } = useParams();
 
-  // Toggle category open/close
-  const handleCategoryToggle = (index) => {
-    setOpenCategory(openCategory === index ? null : index);
-  };
-
-  const products = location.state?.products || [];
-  const { categoryName } = useParams(); 
-  const categoryTitle = categoryName || "جميع المنتجات";
-
-  const categories = [
-    {
-      name: "المنتجات الغذائية",
-      subcategories: ["المشروبات", "الاكل الفلسطيني", "الزيوت"],
-    },
-    { name: "الملابس والاكسسوارات", subcategories: ["الاكسسوارات", "الملابس الرجالية", "الملابس النسائية"] },
-    { name: "الحرف اليدوية", subcategories: ["فخار", "أطباق", "ميدالية"] },
-    {
-      name: "الكتب والمطبوعات",
-      subcategories: ["القصص", "الروايات", "الصحف والمجلات"],
-    },
-    // {
-    //   name: "منتجات فلسطينية",
-    //   subcategories: ["منتجات زيتون", "منتجات التمور", "منتجات حرفية"],
-    // },
-  ];
+  // تحديد المنتجات بناءً على الفئة المختارة
+  const products =
+    !categoryName || categoryName === "all"
+      ? categories.flatMap((category) => category.items) // عرض جميع المنتجات
+      : categories.find((category) => category.title === categoryName)?.items ||
+        [];
 
   return (
     <Box
       sx={{
         width: "100%",
         display: "flex",
-        backgroundRepeat: "no-repeat",
         backgroundColor: "#FCF9F6",
-        backgroundBlendMode: "overlay",
         paddingTop: "30px",
       }}
     >
+      {/* القائمة الجانبية للتصنيفات */}
       <Drawer
         variant="permanent"
         anchor="right"
@@ -68,80 +48,50 @@ function SelectActionCard({ addToCart }) {
             boxSizing: "border-box",
             height: "100vh",
             top: "310px",
-            backgroundColor: "#00000",
           },
         }}
       >
         <List>
+          <ListItemButton component={Link} to={`/category/all`}>
+            <ListItemText
+              primary="جميع المنتجات"
+              sx={{ textAlign: "center", fontWeight: "bold" }}
+            />
+          </ListItemButton>
+          <Divider />
           {categories.map((category, index) => (
             <div key={index}>
               <ListItemButton
-                onClick={() => handleCategoryToggle(index)}
-                sx={{
-                  backgroundColor:
-                    openCategory === index ? "#1e8234" : "transparent",
-                  "&:hover": {
-                    backgroundColor: "#1e8234",
-                  },
-                }}
+                component={Link}
+                to={`/category/${category.title}`}
               >
                 <ListItemText
-                  primary={category.name}
-                  sx={{
-                    textAlign: "center",
-                    color: "#34495e",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      color: "white",
-                    },
-                  }}
+                  primary={category.title}
+                  sx={{ textAlign: "center" }}
                 />
               </ListItemButton>
               <Divider />
-              <Collapse
-                in={openCategory === index}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  {category.subcategories.map((subcategory, subIndex) => (
-                    <ListItemButton key={subIndex} sx={{ pl: 4 }}>
-                      <ListItemText
-                        primary={subcategory}
-                        sx={{
-                          textAlign: "center",
-                          color: "#34495e",
-                        }}
-                      />
-                    </ListItemButton>
-                  ))}
-                </List>
-              </Collapse>
             </div>
           ))}
         </List>
       </Drawer>
+
+      {/* عرض المنتجات */}
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        <Box
-          sx={{
-            width: "100%",
-            padding: "16px",
-            margin: "0 auto",
-            textAlign: "right",
-            display: "block",
-          }}
-        >
+        <Box sx={{ padding: "16px", textAlign: "right" }}>
           <Typography
             variant="h4"
             sx={{
               fontSize: "18px",
               fontWeight: "bold",
-              color: "#34495e",
               marginBottom: "16px",
-              direction: "rtl", // النص من اليمين لليسار
+              direction: "rtl",
             }}
           >
-            الرئيسية &gt; جميع المنتجات &gt; {categoryName}
+            الرئيسية &gt; جميع المنتجات
+            {categoryName && categoryName !== "all"
+              ? ` > ${categoryName}`
+              : ""}
           </Typography>
         </Box>
         <Box
@@ -150,13 +100,7 @@ function SelectActionCard({ addToCart }) {
             padding: "50px",
             paddingTop: "0px",
             display: "grid",
-            gridTemplateColumns: {
-              xs: "repeat(1, 1fr)",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              lg: "repeat(4, 1fr)",
-              xl: "repeat(5, 1fr)",
-            },
+            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
             gap: 2,
           }}
         >

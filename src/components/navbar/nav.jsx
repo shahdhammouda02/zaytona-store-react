@@ -15,7 +15,7 @@ import {
   InputBase,
   Button,
   Menu,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -28,6 +28,7 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import logo from "../../assets/images/logo.png";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { Autocomplete, TextField } from "@mui/material";
+import { categories } from "../data/data";
 const searchSuggestions = [
   "زيت الزيتون",
   "كوفية",
@@ -37,7 +38,6 @@ const searchSuggestions = [
   "ملابس رياضية",
   "حرف يدوية",
 ];
-
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -73,7 +73,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Navbar = ({ cartItems, updateQuantity, removeFromCart, categories = [] }) => {
+const Navbar = ({ cartItems, updateQuantity, removeFromCart }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("authToken")
@@ -82,9 +82,14 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, categories = [] }) 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Categories fetched:", categories);
-  }, [categories]);
-  
+    const handleStorageChange = () => {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
@@ -127,7 +132,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, categories = [] }) 
     setAnchorEl(null);
     setCurrentCategory(null);
   };
-  
+
   return (
     <>
       <AppBar
@@ -136,22 +141,32 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, categories = [] }) 
       >
         <Toolbar>
           <Link to="/">
-          <IconButton
-            size="large"
-            edge="start"
-            color="black"
-            aria-label="open drawer"
-            sx={{ mr: 2, "&:hover": { backgroundColor: "inherit !important" } }}
-          >
-            <img
-              src={logo}
-              alt="Logo"
-              style={{ width: "135px", height: "auto" }}
-            />
-          </IconButton>
+            <IconButton
+              size="large"
+              edge="start"
+              color="black"
+              aria-label="open drawer"
+              sx={{
+                mr: 2,
+                "&:hover": { backgroundColor: "inherit !important" },
+              }}
+            >
+              <img
+                src={logo}
+                alt="Logo"
+                style={{ width: "135px", height: "auto" }}
+              />
+            </IconButton>
           </Link>
 
-          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" ,height:"45px"}}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              justifyContent: "center",
+              height: "45px",
+            }}
+          >
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -278,78 +293,94 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, categories = [] }) 
           </Box>
         </Toolbar>
 
-        <Box sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}>
-      <Link to="/products/" style={{ textDecoration: "none", color: "inherit" }}>
-        <IconButton
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignContent: "center",
-            paddingLeft: "20px",
-            fontWeight: "bolder",
-            "&:hover": { backgroundColor: "inherit !important" },
-          }}
+        <Box
+          sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}
         >
-          <MenuIcon style={{ color: "black" }} />
-          <Typography
-            style={{
-              margin: 0,
-              padding: 0,
-              fontSize: "20px",
-              fontFamily: "Cairo",
-              color: "#000",
-            }}
+          <Link
+           to="/category/all"
+            state={{ category: "all" }}
+            style={{ textDecoration: "none", color: "inherit" }}
           >
-            جميع المنتجات
-          </Typography>
-        </IconButton>
-      </Link>
-
-      {categories.map((category, index) => (
-        <div key={index}>
-          <IconButton
-            onClick={(event) => handleClick(event, category)}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignContent: "center",
-              paddingLeft: "20px",
-              fontWeight: "bolder",
-              "&:hover": { backgroundColor: "inherit !important" },
-            }}
-          >
-            <Typography
-              style={{
-                margin: 0,
-                padding: 0,
-                fontSize: "20px",
-                fontFamily: "Cairo",
-                color: "#000",
+            <IconButton
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignContent: "center",
+                paddingLeft: "20px",
+                fontWeight: "bolder",
+                "&:hover": { backgroundColor: "inherit !important" },
               }}
             >
-              {category.title}
-            </Typography>
-          </IconButton>
+              <MenuIcon style={{ color: "black" }} />
+              <Typography
+                style={{
+                  margin: 0,
+                  padding: 0,
+                  fontSize: "20px",
+                  fontFamily: "Cairo",
+                  color: "#000",
+                }}
+              >
+                جميع المنتجات
+              </Typography>
+            </IconButton>
+          </Link>
 
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl) && currentCategory?.name === category.name}
-            onClose={handleClose}
-          >
-            {currentCategory?.subcategories.map((subcategory, subIndex) => (
-              <MenuItem key={subIndex} onClick={handleClose}>
+          {categories.map((category, index) => (
+            <div key={index}>
+              <IconButton
+                onClick={(event) => handleClick(event, category)}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  paddingLeft: "20px",
+                  fontWeight: "bolder",
+                  "&:hover": { backgroundColor: "inherit !important" },
+                }}
+              >
                 <Link
-                  to={`/category/${currentCategory.name}?subcategory=${subcategory}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
+                  to={`/category/${category.title}`}
+                  state={{ products: category.items }}
+                  style={{ textDecoration: "none" }}
                 >
-                  {subcategory}
+                  <Typography
+                    style={{
+                      margin: 0,
+                      padding: 0,
+                      fontSize: "20px",
+                      fontFamily: "Cairo",
+                      color: "#000",
+                    }}
+                  >
+                    {category.title}
+                  </Typography>
                 </Link>
-              </MenuItem>
-            ))}
-          </Menu>
-        </div>
-      ))}
-    </Box>
+              </IconButton>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={
+                  Boolean(anchorEl) && currentCategory?.title === category.title
+                }
+                onClose={handleClose}
+              >
+                {currentCategory?.subcategories?.map(
+                  (subcategory, subIndex) => (
+                    <MenuItem key={subIndex} onClick={handleClose}>
+                      <Link
+                        to={`/products/${category.title}?subcategory=${subcategory}`}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        {subcategory}
+                      </Link>
+                    </MenuItem>
+                  )
+                )}
+              </Menu>
+            </div>
+          ))}
+        </Box>
       </AppBar>
 
       <Drawer
