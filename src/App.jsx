@@ -12,7 +12,7 @@ import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
 import SelectActionCard from "./components/products/ProductsPage";
 import Footer from "./components/footer/footer";
-import SignIn from "./components/login-logout/logoin";
+import SignIn from "./components/login-logout/SignIn";
 import SignUp from "./components/login-logout/SignUp";
 
 const theme = createTheme({
@@ -27,6 +27,38 @@ const AppContent = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
+
+  const addToFavorites = (product) => {
+    if (!favorites.some((fav) => fav.id === product.id)) {
+      setFavorites([...favorites, product]);
+    }
+  };
+
+  const removeFromFavorites = (productId) => {
+    setFavorites(favorites.filter((fav) => fav.id !== productId));
+  };
+
+  const clearFavorites = () => {
+    setFavorites([]);
+  };
+
+  const handleAddToCart = (item) => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    addToCart(item);
+  };
+
+  const handleAddToFavorites = (item) => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    addToFavorites(item);
+  };
 
   const updateCategories = (categories) => {
     setCategories(categories);
@@ -74,6 +106,11 @@ const AppContent = () => {
           updateQuantity={updateQuantity}
           removeFromCart={removeFromCart}
           categories={categories}
+          favorites={favorites}
+          removeFromFavorites={removeFromFavorites}
+          clearFavorites={clearFavorites}
+          addToCart={addToCart}
+          addToFavorites={addToFavorites}
         />
       )}
 
@@ -85,6 +122,11 @@ const AppContent = () => {
               <Hero />
               <CategorySection
                 addToCart={addToCart}
+                addToFavorites={addToFavorites}
+                removeFromFavorites={removeFromFavorites}
+                favorites={favorites}
+                handleAddToCart={handleAddToCart}
+                handleAddToFavorites={handleAddToFavorites}
                 updateCategories={updateCategories}
                 navigateToCategory={navigateToCategory}
               />
@@ -96,6 +138,11 @@ const AppContent = () => {
           element={
             <SelectActionCard
               addToCart={addToCart}
+              addToFavorites={addToFavorites}
+              removeFromFavorites={removeFromFavorites}
+              favorites={favorites}
+              handleAddToCart={handleAddToCart}
+              handleAddToFavorites={handleAddToFavorites} 
               categories={categories}
               products={location.state?.products || []}
             />

@@ -7,12 +7,22 @@ import {
   CardMedia,
   Box,
   Button,
+  IconButton,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import categorybg from "../../assets/images/categorybg.jpg";
 import { categories } from "../data/data";
-const CategorySection = ({ addToCart }) => {
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
+const CategorySection = ({
+  addToCart,
+  addToFavorites,
+  removeFromFavorites,
+  favorites,
+  handleAddToCart, // استقبال الدالة الجديدة
+  handleAddToFavorites, // استقبال الدالة الجديدة
+}) => {
   return (
     <Box
       sx={{
@@ -135,7 +145,7 @@ const CategorySection = ({ addToCart }) => {
                         <Button
                           variant="contained"
                           color="success"
-                          onClick={() => addToCart(item)}
+                          onClick={() => handleAddToCart(item)} // استخدام الدالة الجديدة
                           sx={{
                             borderRadius: "50px",
                             padding: "8px 20px",
@@ -149,6 +159,25 @@ const CategorySection = ({ addToCart }) => {
                         >
                           أضف إلى السلة
                         </Button>
+                        <IconButton
+                          onClick={
+                            () =>
+                              favorites.some((fav) => fav.id === item.id)
+                                ? removeFromFavorites(item.id)
+                                : handleAddToFavorites(item) // استخدام الدالة الجديدة
+                          }
+                          sx={{
+                            color: favorites.some((fav) => fav.id === item.id)
+                              ? "#E4312C"
+                              : "inherit",
+                          }}
+                        >
+                          {favorites.some((fav) => fav.id === item.id) ? (
+                            <FavoriteIcon />
+                          ) : (
+                            <FavoriteBorderIcon />
+                          )}
+                        </IconButton>
                       </Box>
                     </CardContent>
                   </Card>
