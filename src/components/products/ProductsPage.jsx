@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { categories } from "../data/data";
 import { Link } from "react-router-dom";
 import {
@@ -14,17 +14,47 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
+  IconButton,
+  Collapse,
 } from "@mui/material";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
-function SelectActionCard({ addToCart }) {
+function SelectActionCard({
+  addToCart,
+  addToFavorites,
+  removeFromFavorites,
+  favorites,
+  handleAddToCart,
+  handleAddToFavorites,
+}) {
   const { categoryName } = useParams();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const subcategory = queryParams.get("subcategory");
 
-  // تحديد المنتجات بناءً على الفئة المختارة
+  const [openCategories, setOpenCategories] = React.useState({});
+
+  const handleToggle = (categoryTitle) => {
+    setOpenCategories((prev) => ({
+      ...prev,
+      [categoryTitle]: !prev[categoryTitle],
+    }));
+  };
+
   const products =
     !categoryName || categoryName === "all"
-      ? categories.flatMap((category) => category.items) // عرض جميع المنتجات
-      : categories.find((category) => category.title === categoryName)?.items ||
-        [];
+      ? categories.flatMap((category) => category.items)
+      : categories
+          .find((category) => category.title === categoryName)
+          ?.items.filter((item) =>
+            subcategory ? item.subcategory === subcategory : true
+          ) || [];
+
+  const isFavorite = (productId) =>
+    favorites.some((fav) => fav.id === productId);
 
   return (
     <Box
@@ -35,7 +65,6 @@ function SelectActionCard({ addToCart }) {
         paddingTop: "30px",
       }}
     >
-      {/* القائمة الجانبية للتصنيفات */}
       <Drawer
         variant="permanent"
         anchor="right"
@@ -46,7 +75,8 @@ function SelectActionCard({ addToCart }) {
             position: "static",
             width: 240,
             boxSizing: "border-box",
-            height: "100vh",
+            height: "auto",
+            maxHeight: "calc(100vh - 310px)",
             top: "310px",
           },
         }}
@@ -55,28 +85,51 @@ function SelectActionCard({ addToCart }) {
           <ListItemButton component={Link} to={`/category/all`}>
             <ListItemText
               primary="جميع المنتجات"
-              sx={{ textAlign: "center", fontWeight: "bold" }}
+              sx={{ textAlign: "center", fontWeight: "bold", fontSize: "14px" }}
             />
           </ListItemButton>
           <Divider />
           {categories.map((category, index) => (
             <div key={index}>
-              <ListItemButton
-                component={Link}
-                to={`/category/${category.title}`}
-              >
+              <ListItemButton onClick={() => handleToggle(category.title)}>
                 <ListItemText
                   primary={category.title}
-                  sx={{ textAlign: "center" }}
+                  sx={{ textAlign: "center", fontSize: "14px" }}
                 />
+                {openCategories[category.title] ? (
+                  <ExpandLess />
+                ) : (
+                  <ExpandMore />
+                )}
               </ListItemButton>
+              <Collapse
+                in={openCategories[category.title]}
+                timeout="auto"
+                unmountOnExit
+                sx={{ transition: "max-height 0.3s ease-in-out" }}
+              >
+                <List component="div" disablePadding>
+                  {category.subcategories?.map((subcategory, subIndex) => (
+                    <ListItemButton
+                      key={subIndex}
+                      component={Link}
+                      to={`/category/${category.title}?subcategory=${subcategory}`}
+                      sx={{ pl: 4, fontSize: "13px" }}
+                    >
+                      <ListItemText
+                        primary={subcategory}
+                        sx={{ textAlign: "center" }}
+                      />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Collapse>
               <Divider />
             </div>
           ))}
         </List>
       </Drawer>
 
-      {/* عرض المنتجات */}
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
         <Box sx={{ padding: "16px", textAlign: "right" }}>
           <Typography
@@ -89,9 +142,8 @@ function SelectActionCard({ addToCart }) {
             }}
           >
             الرئيسية &gt; جميع المنتجات
-            {categoryName && categoryName !== "all"
-              ? ` > ${categoryName}`
-              : ""}
+            {categoryName && categoryName !== "all" ? ` > ${categoryName}` : ""}
+            {subcategory ? ` > ${subcategory}` : ""}
           </Typography>
         </Box>
         <Box
@@ -145,11 +197,7 @@ function SelectActionCard({ addToCart }) {
                 </Typography>
                 <Typography
                   variant="h6"
-                  sx={{
-                    color: "#555",
-                    fontSize: "16px",
-                    textAlign: "center",
-                  }}
+                  sx={{ color: "#555", fontSize: "16px", textAlign: "center" }}
                 >
                   {product.salary} $
                 </Typography>
@@ -157,7 +205,7 @@ function SelectActionCard({ addToCart }) {
                   <Button
                     variant="contained"
                     color="success"
-                    onClick={() => addToCart(product)}
+                    onClick={() => handleAddToCart(product)}
                     sx={{
                       borderRadius: "50px",
                       padding: "8px 20px",
@@ -171,6 +219,20 @@ function SelectActionCard({ addToCart }) {
                   >
                     أضف إلى السلة
                   </Button>
+                  <IconButton
+                    onClick={() =>
+                      isFavorite(product.id)
+                        ? removeFromFavorites(product.id)
+                        : handleAddToFavorites(product)
+                    }
+                    sx={{ marginTop: "10px" }}
+                  >
+                    {isFavorite(product.id) ? (
+                      <FavoriteIcon sx={{ color: "red" }} />
+                    ) : (
+                      <FavoriteBorderIcon />
+                    )}
+                  </IconButton>
                 </Box>
               </CardContent>
             </Card>
