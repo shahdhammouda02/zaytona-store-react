@@ -17,7 +17,7 @@ export const categories = [
         id: 1,
         name: "زيت الزيتون الفلسطيني الاصلي  ",
         image: oliveoil,
-        salary: "5.99",
+        salary: "6",
         subcategory: "المشروبات"
       },
       {
