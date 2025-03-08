@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Stack,
-} from "@mui/material";
+import { Box, Button, TextField, Typography, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Bg from "../../assets/images/bg.png";
 import logo from "../../assets/images/logo.png";
+import { signupUser } from "../../STORE/SLICE/registerSlice/registerAction";
+import { useDispatch, useSelector } from "react-redux";
 
 // Styled components لتنسيق الصفحة
 const Container = styled("div")(({ theme }) => ({
@@ -72,46 +68,47 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 const SignUp = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
-  const [error, setError] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [agree, setAgree] = useState(false); // حالة لموافقة المستخدم
+
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.signup);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleSignUp = async (e) => {
+    e.preventDefault(); // لمنع إعادة تحميل الصفحة عند إرسال النموذج
 
-  const handleSignUp = (e) => {
-    e.preventDefault();
-    setError("");
+    if (!agree) {
+      alert("يجب الموافقة على الشروط والأحكام.");
+      return;
+    }
+
+    if (!name || !email || !password) {
+      alert("جميع الحقول مطلوبة.");
+      return;
+    }
 
     try {
-      // Retrieve existing users or initialize an empty array
-      const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
+      const res = await dispatch(signupUser({ name, email, password }));
+      console.log("🔹 API Response:", res);
 
-      // Check if the email is already registered
-      if (existingUsers.some((user) => user.email === formData.email)) {
-        setError("البريد الإلكتروني مسجل بالفعل.");
-        return;
+      if (res.payload?.success) {
+        alert(res.payload?.message || "تم التسجيل بنجاح!");
+
+        // ✅ إذا لم يكن هناك Token، انتقل إلى صفحة تسجيل الدخول
+        if (!res.payload.token) {
+          navigate("/login");
+        } else {
+          navigate("/login");
+        }
+      } else {
+        alert(res.payload?.message || "حدث خطأ أثناء التسجيل.");
       }
-
-      // Add the new user to the list
-      const newUser = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      };
-      existingUsers.push(newUser);
-
-      // Save back to localStorage
-      localStorage.setItem("users", JSON.stringify(existingUsers));
-
-      // Automatically log in the newly registered user
-      localStorage.setItem("authToken", "fake-auth-token");
-      localStorage.setItem("loggedInUser", JSON.stringify(newUser));
-
-      navigate("/"); // Redirect to the homepage
-    } catch (err) {
-      setError("حدث خطأ أثناء إنشاء الحساب.");
+    } catch (error) {
+      console.error("❌ Signup Error:", error);
+      alert("حدث خطأ غير متوقع. حاول مرة أخرى.");
     }
   };
 
@@ -131,92 +128,101 @@ const SignUp = () => {
 
       {/* القسم الأيمن (النموذج) */}
       <RightSection>
-  <FormContainer>
-    <Typography
-      variant="h4"
-      sx={{
-        fontWeight: "bold",
-        mb: 4,
-        textAlign: "center",
-        color: "#000",
-      }}
-    >
-      إنشاء حساب جديد
-    </Typography>
-    {error && (
-      <Typography color="error" sx={{ textAlign: "center", mb: 2 }}>
-        {error}
-      </Typography>
-    )}
-    <form onSubmit={handleSignUp} noValidate>
-      <Stack spacing={3}>
-        <Box sx={{ textAlign: "right" }}>
-          <Typography variant="body1" sx={{ mb: 1, fontWeight: "bold" }}>
-            الاسم الكامل
-          </Typography>
-          <TextField
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            fullWidth
+        <FormContainer>
+          <Typography
+            variant="h4"
             sx={{
-              '& .MuiOutlinedInput-root': {
-                paddingTop: '0px', // تقليل padding من الأعلى
-                paddingBottom: '0px', // تقليل padding من الأسفل
-              },
+              fontWeight: "bold",
+              mb: 4,
+              textAlign: "center",
+              color: "#000",
             }}
-          />
-        </Box>
-        <Box sx={{ textAlign: "right" }}>
-          <Typography variant="body1" sx={{ mb: 1, fontWeight: "bold" }}>
-            البريد الإلكتروني
+          >
+            إنشاء حساب جديد
           </Typography>
-          <TextField
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                paddingTop: '0px', // تقليل padding من الأعلى
-                paddingBottom: '0px', // تقليل padding من الأسفل
-              },
-            }}
-          />
-        </Box>
-        <Box sx={{ textAlign: "right" }}>
-          <Typography variant="body1" sx={{ mb: 1, fontWeight: "bold" }}>
-            كلمة المرور
+          {error && (
+            <Typography color="error" sx={{ textAlign: "center", mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+          <form onSubmit={handleSignUp} noValidate>
+            <Stack spacing={3}>
+              <Box sx={{ textAlign: "right" }}>
+                <Typography variant="body1" sx={{ mb: 1, fontWeight: "bold" }}>
+                  الاسم الكامل
+                </Typography>
+                <TextField
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      paddingTop: "0px", // تقليل padding من الأعلى
+                      paddingBottom: "0px", // تقليل padding من الأسفل
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ textAlign: "right" }}>
+                <Typography variant="body1" sx={{ mb: 1, fontWeight: "bold" }}>
+                  البريد الإلكتروني
+                </Typography>
+                <TextField
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      paddingTop: "0px", // تقليل padding من الأعلى
+                      paddingBottom: "0px", // تقليل padding من الأسفل
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ textAlign: "right" }}>
+                <Typography variant="body1" sx={{ mb: 1, fontWeight: "bold" }}>
+                  كلمة المرور
+                </Typography>
+                <TextField
+                  name="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      paddingTop: "0px", // تقليل padding من الأعلى
+                      paddingBottom: "0px", // تقليل padding من الأسفل
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ textAlign: "right" }}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={agree}
+                    onChange={() => setAgree(!agree)}
+                  />
+                  <span>أوافق على الشروط والأحكام</span>
+                </label>
+              </Box>
+              <CustomButton type="submit" fullWidth disabled={loading}>
+                {loading ? "جاري التسجيل..." : "إنشاء حساب"}
+              </CustomButton>
+            </Stack>
+          </form>
+          <Typography sx={{ textAlign: "center", marginTop: 2 }}>
+            لديك حساب بالفعل؟{" "}
+            <Link to="/login" style={{ color: "#000", fontWeight: "bold" }}>
+              تسجيل الدخول
+            </Link>
           </Typography>
-          <TextField
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                paddingTop: '0px', // تقليل padding من الأعلى
-                paddingBottom: '0px', // تقليل padding من الأسفل
-              },
-            }}
-          />
-        </Box>
-        <CustomButton type="submit" fullWidth>
-          إنشاء حساب جديد
-        </CustomButton>
-      </Stack>
-    </form>
-    <Typography sx={{ textAlign: "center", marginTop: 2 }}>
-      لديك حساب بالفعل؟{" "}
-      <Link to="/login" style={{ color: "#000", fontWeight: "bold" }}>
-        تسجيل الدخول
-      </Link>
-    </Typography>
-  </FormContainer>
-</RightSection>
-
+        </FormContainer>
+      </RightSection>
     </Container>
   );
 };

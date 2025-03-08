@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { loginVendor } from "../../STORE/SLICE/LoginSlice/loginAction"; // تأكد من تعديل المسار وفقاً لموقع الأكشن.
+
 import {
   Box,
   Button,
@@ -15,12 +17,10 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AppTheme from "./components/AppTheme";
-import {
-  GoogleIcon,
-  FacebookIcon,
-} from "./components/CustomIcons";
+import { GoogleIcon, FacebookIcon } from "./components/CustomIcons";
 import Bg from "../../assets/images/bg.png";
 import logo from "../../assets/images/logo.png";
+import { useSelector, useDispatch } from "react-redux";
 
 const Container = styled("div")(({ theme }) => ({
   display: "flex",
@@ -35,7 +35,7 @@ const LeftSection = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  position: "relative", // لإضافة طبقة فوق الخلفية
+  position: "relative",
 }));
 
 const Overlay = styled(Box)(({ theme }) => ({
@@ -44,12 +44,12 @@ const Overlay = styled(Box)(({ theme }) => ({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: "rgba(255, 255, 255, 0.7)", // خلفية بيضاء شفافة
+  backgroundColor: "rgba(255, 255, 255, 0.7)",
 }));
 
 const LogoContainer = styled(Box)(({ theme }) => ({
-  position: "relative", // لجعل الشعار فوق الخلفية البيضاء
-  zIndex: 1, // للتأكد من أن الشعار فوق الخلفية البيضاء
+  position: "relative",
+  zIndex: 1,
 }));
 
 const RightSection = styled(Box)(({ theme }) => ({
@@ -82,60 +82,61 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 const SignIn = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const savedCredentials = JSON.parse(localStorage.getItem("rememberedUser"));
-    if (savedCredentials) {
-      setFormData({
-        email: savedCredentials.email,
-        password: savedCredentials.password,
-      });
-      setRememberMe(true);
-    }
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const error = useSelector((state) => state.login.error);
+  const loading = useSelector((state) => state.login.loading);
 
   const handleSignIn = (e) => {
     e.preventDefault();
-    setError("");
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const matchedUser = users.find(
-      (user) =>
-        user.email === formData.email && user.password === formData.password
-    );
-
-    if (matchedUser) {
-      localStorage.setItem("authToken", "fake-auth-token");
-      localStorage.setItem("loggedInUser", JSON.stringify(matchedUser));
-
-      if (rememberMe) {
-        localStorage.setItem(
-          "rememberedUser",
-          JSON.stringify({ email: formData.email, password: formData.password })
-        );
-      } else {
-        localStorage.removeItem("rememberedUser");
-      }
-
-      navigate("/");
-    } else {
-      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+    if (!email || !password) {
+      alert("يرجى ملء جميع الحقول.");
+      return;
     }
+
+    dispatch(loginVendor({ email, password }))
+      .then((res) => {
+        if (res.payload?.token) {
+          // حفظ التوكن والمستخدم في localStorage
+          localStorage.setItem("authToken", res.payload.token);
+          localStorage.setItem(
+            "loggedInUser",
+            JSON.stringify(res.payload.user)
+          );
+
+          // إذا كان المستخدم يريد تذكر بيانات الدخول
+          if (rememberMe) {
+            localStorage.setItem(
+              "rememberedUser",
+              JSON.stringify({ email, password })
+            );
+          } else {
+            localStorage.removeItem("rememberedUser");
+          }
+
+          // حفظ البريد الإلكتروني في localStorage
+          localStorage.setItem("email", email);
+
+          navigate("/."); // الانتقال إلى الصفحة الرئيسية
+        } else {
+          alert("تسجيل الدخول غير ناجح. حاول مرة أخرى.");
+        }
+      })
+      .catch((error) => {
+        alert("حدث خطأ أثناء محاولة تسجيل الدخول.");
+      });
   };
 
   return (
     <AppTheme background={Bg}>
       <CssBaseline enableColorScheme />
       <Container>
-        {/* القسم الأيسر (الصورة) */}
         <LeftSection>
           <Overlay />
           <LogoContainer>
@@ -147,7 +148,6 @@ const SignIn = () => {
           </LogoContainer>
         </LeftSection>
 
-        {/* القسم الأيمن (النموذج) */}
         <RightSection>
           <FormContainer>
             <Typography
@@ -173,8 +173,8 @@ const SignIn = () => {
                 </Typography>
                 <TextField
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   fullWidth
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -190,8 +190,8 @@ const SignIn = () => {
                 <TextField
                   name="password"
                   type="password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   fullWidth
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -208,26 +208,37 @@ const SignIn = () => {
                 control={
                   <Checkbox
                     checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
+                    onChange={() => setRememberMe(!rememberMe)}
                   />
                 }
                 label="تذكرني"
               />
-              <CustomButton type="submit" fullWidth onClick={handleSignIn}>
-                تسجيل الدخول
+              <CustomButton onClick={handleSignIn} disabled={loading}>
+                {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
               </CustomButton>
               <Typography sx={{ textAlign: "center", marginTop: 2 }}>
                 ليس لديك حساب؟{" "}
-                <Link to="/register" style={{ color: "#000", fontWeight: "bold" }}>
+                <Link
+                  to="/register"
+                  style={{ color: "#000", fontWeight: "bold" }}
+                >
                   إنشاء حساب جديد
                 </Link>
               </Typography>
-              <Divider sx={{ margin: "16px 0" }}>أو تسجيل الدخول بواسطة:</Divider>
+              <Divider sx={{ margin: "16px 0" }}>
+                أو تسجيل الدخول بواسطة:
+              </Divider>
               <Stack direction="row" spacing={2} justifyContent="center">
-                <IconButton sx={{ border: "1px solid #ddd" }}>
+                <IconButton
+                  sx={{ border: "1px solid #ddd" }}
+                  onClick={() => alert("Sign in with Google")}
+                >
                   <GoogleIcon sx={{ fontSize: "32px", color: "#DB4437" }} />
                 </IconButton>
-                <IconButton sx={{ border: "1px solid #ddd" }}>
+                <IconButton
+                  sx={{ border: "1px solid #ddd" }}
+                  onClick={() => alert("Sign in with Facebook")}
+                >
                   <FacebookIcon sx={{ fontSize: "32px", color: "#1877F2" }} />
                 </IconButton>
               </Stack>
