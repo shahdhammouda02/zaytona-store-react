@@ -9,12 +9,15 @@ import {
   Button,
   IconButton,
 } from "@mui/material";
+import { useState, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import categorybg from "../../assets/images/categorybg.jpg";
 import { categories } from "../data/data";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-
+import { fetchCategories } from "../../STORE/SLICE/mainCategory/mainCategoryAction";
+import {fetchProductscategory}from "../../STORE/SLICE/productSlice/productsAction";
 const CategorySection = ({
   addToCart,
   addToFavorites,
@@ -23,6 +26,12 @@ const CategorySection = ({
   handleAddToCart, // استقبال الدالة الجديدة
   handleAddToFavorites, // استقبال الدالة الجديدة
 }) => {
+  const { categories } = useSelector((state) => state.categories);
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchProductscategory());
+  }, [dispatch]);
+   const dispatch = useDispatch();
   return (
     <Box
       sx={{
@@ -92,8 +101,8 @@ const CategorySection = ({
                 </Card>
               </Grid>
 
-              {category.items.slice(0, 3).map((item) => (
-                <Grid item xs={12} sm={6} md={3} key={item.id}>
+              {categories?.data?.map((category) => (
+                <Grid item xs={12} sm={6} md={3} key={category.id}>
                   <Card
                     sx={{
                       maxWidth: 240,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   AppBar,
   Toolbar,
@@ -16,6 +17,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import { fetchSearchResults } from "../../STORE/SLICE/seaechslice/searchAction"; // استيراد البحث من Redux
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -28,17 +30,14 @@ import logo from "../../assets/images/logo.png";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { Autocomplete, TextField } from "@mui/material";
 import { categories } from "../data/data";
-
-const searchSuggestions = [
-  "زيت الزيتون",
-  "كوفية",
-  "ثوب فلاحي",
-  "ميدالية",
-  "منتجات غذائية",
-  "ملابس رياضية",
-  "حرف يدوية",
-];
-
+import {
+  fetchDeliveries,
+  addToFavorites,
+  removeFromFavorites,
+  removeAllFromFavorites,
+} from "../../STORE/SLICE/favSlice/favAction";
+import { fetchCategories } from "../../STORE/SLICE/mainCategory/mainCategoryAction"; // استيراد جلب الفئات
+import { fetchSubCategories } from "../../STORE/SLICE/subCategory/subCategoryAction";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: "20px",
@@ -63,27 +62,57 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   left: 0,
 }));
 
-const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFromFavorites, clearFavorites }) => {
+const Navbar = ({
+  cartItems,
+  updateQuantity,
+  removeFromCart,
+  favorites,
+  removeFromFavorites,
+  clearFavorites,
+}) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [favoritesDrawerOpen, setFavoritesDrawerOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("authToken")
-  );
-  const [searchTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const { results } = useSelector((state) => state.search);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("authToken") !== null
+  );
+  const { subCategories } = useSelector((state) => state.subCategories);
+  const [openCategories, setOpenCategories] = React.useState({});
+  const { categories, loading, error } = useSelector(
+    (state) => state.categories
+  );
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchSubCategories());
+  }, [dispatch]);
+
+  const handleSearchChange = (event, newValue) => {
+    setSearchTerm(newValue);
+  };
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("authToken"));
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+    if (searchTerm.trim() !== "") {
+      dispatch(fetchSearchResults(searchTerm));
+    }
+  }, [searchTerm, dispatch]);
+  console.log("الفئات:", categories);
+
+  useEffect(() => {
+    console.log("نتائج البحث:", results); // طباعة النتائج في الكونسول
+  }, [results]);
+
+  useEffect(() => {
+    if (searchTerm.trim() !== "") {
+      dispatch(fetchSearchResults(searchTerm));
+    }
+  }, [searchTerm, dispatch]);
 
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
-  const toggleFavoritesDrawer = () => setFavoritesDrawerOpen(!favoritesDrawerOpen);
+  const toggleFavoritesDrawer = () =>
+    setFavoritesDrawerOpen(!favoritesDrawerOpen);
 
   const totalAmount = cartItems.reduce(
     (total, item) => total + item.salary * item.quantity,
@@ -111,7 +140,10 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFr
       navigate("/login");
     }
   };
-
+  const handleSearchSubmit = (searchTerm) => {
+    console.log("تم البحث عن:", searchTerm);
+    // هنا يمكنك تنفيذ البحث أو توجيه المستخدم إلى صفحة النتائج
+  };
   const [anchorEl, setAnchorEl] = useState(null);
   const [currentCategory, setCurrentCategory] = useState(null);
 
@@ -124,7 +156,6 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFr
     setAnchorEl(null);
     // setCurrentCategory(null);
   };
-
   return (
     <>
       <AppBar
@@ -165,25 +196,24 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFr
               </SearchIconWrapper>
               <Autocomplete
                 freeSolo
-                options={searchSuggestions}
-                inputValue={searchTerm}
-                onInputChange={(event, newValue) => setSearchTerm(newValue)}
+                options={
+                  Array.isArray(results)
+                    ? results.map((product) => product.name)
+                    : []
+                }
+                onInputChange={handleSearchChange}
                 renderInput={(params) => (
                   <TextField
-                    sx={{
-                      "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                      padding: "0.5px 4px 7.5px 5px",
-                      "& .MuiInputBase-input": {
-                        transform: "translateY(-4px)",
-                      },
-                      "& .MuiInputBase-input::placeholder": {
-                        transform: "translateY(-4px)",
-                      },
-                    }}
                     {...params}
                     variant="outlined"
-                    placeholder="ما الذي تبحث عنه ...."
-                    fullWidth
+                    placeholder="بحث عن المنتجات..."
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault(); // منع السلوك الافتراضي (مثل إرسال النموذج إذا كان داخل <form>)
+                        console.log("تم البحث عن:", event.target.value);
+                        handleSearchSubmit(event.target.value); // استدعاء دالة البحث عند الضغط على Enter
+                      }
+                    }}
                   />
                 )}
               />
@@ -243,7 +273,11 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFr
             >
               <Badge badgeContent={favorites.length} color="error">
                 <FavoriteIcon
-                  sx={{ color: "#E4312C", fontSize: "35px", marginBottom: "5px" }}
+                  sx={{
+                    color: "#E4312C",
+                    fontSize: "35px",
+                    marginBottom: "5px",
+                  }}
                 />
               </Badge>
               <span
@@ -295,92 +329,94 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFr
         </Toolbar>
 
         <Box
-  sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}
->
-  <Link
-    to="/category/all"
-    state={{ category: "all" }}
-    style={{ textDecoration: "none", color: "inherit" }}
-  >
-    <IconButton
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignContent: "center",
-        paddingLeft: "20px",
-        fontWeight: "bolder",
-        "&:hover": { backgroundColor: "inherit !important" },
-      }}
-    >
-      <MenuIcon style={{ color: "black" }} />
-      <Typography
-        style={{
-          margin: 0,
-          padding: 0,
-          fontSize: "20px",
-          fontFamily: "Cairo",
-          color: "#000",
-        }}
-      >
-        جميع المنتجات
-      </Typography>
-    </IconButton>
-  </Link>
-
-  {categories.map((category, index) => (
-    <div key={index}>
-      <IconButton
-        onClick={(event) => handleClick(event, category)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignContent: "center",
-          paddingLeft: "20px",
-          fontWeight: "bolder",
-          "&:hover": { backgroundColor: "inherit !important" },
-        }}
-      >
-        <Link
-          to={`/category/${category.title}`}
-          state={{ products: category.items }}
-          style={{ textDecoration: "none" }}
+          sx={{ display: "flex", justifyContent: "center", padding: "20px 0" }}
         >
-          <Typography
-            style={{
-              margin: 0,
-              padding: 0,
-              fontSize: "20px",
-              fontFamily: "Cairo",
-              color: "#000",
-            }}
+          <Link
+            to="/category/all"
+            state={{ category: "all" }}
+            style={{ textDecoration: "none", color: "inherit" }}
           >
-            {category.title}
-          </Typography>
-        </Link>
-      </IconButton>
-
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl) && currentCategory?.title === category.title}
-        onClose={handleClose}
-      >
-        {currentCategory?.subcategories?.map((subcategory, subIndex) => (
-          <MenuItem key={subIndex} onClick={handleClose}>
-            <Link
-              to={`/category/${category.title}?subcategory=${subcategory}`}
-              style={{ textDecoration: "none", color: "inherit" }}
+            <IconButton
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignContent: "center",
+                paddingLeft: "20px",
+                fontWeight: "bolder",
+                "&:hover": { backgroundColor: "inherit !important" },
+              }}
             >
-              {subcategory}
-            </Link>
-          </MenuItem>
-        ))}
-      </Menu>
-    </div>
-  ))}
-</Box>
+              <MenuIcon style={{ color: "black" }} />
+              <Typography
+                style={{
+                  margin: 0,
+                  padding: 0,
+                  fontSize: "20px",
+                  fontFamily: "Cairo",
+                  color: "#000",
+                }}
+              >
+                جميع المنتجات
+              </Typography>
+            </IconButton>
+          </Link>
+          {categories?.data?.map((category, index) => (
+            <div key={index}>
+              <IconButton
+                onClick={(event) => handleClick(event, category)}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingLeft: "20px",
+                  fontWeight: "bolder",
+                  "&:hover": { backgroundColor: "inherit !important" },
+                }}
+              >
+                <Link
+                  to={`/category/${category.title}`}
+                  state={{ products: category.items }}
+                  style={{ textDecoration: "none" }}
+                >
+                  <Typography
+                    style={{
+                      margin: 0,
+                      padding: 0,
+                      fontSize: "20px",
+                      fontFamily: "Cairo",
+                      color: "#000",
+                    }}
+                  >
+                    {category.name}
+                  </Typography>
+                </Link>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={
+                  Boolean(anchorEl) && currentCategory?.name === category.name
+                }
+                onClose={handleClose}
+              >
+                {subCategories?.data
+                  ?.filter((sub) => sub.category_id === category.id)
+                  .map((sub, subIndex) => (
+                    <MenuItem key={subIndex} onClick={handleClose}>
+                      <Link
+                        to={`/category/${category.title}?subcategory=${sub.name}`}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        {sub.name}
+                      </Link>
+                    </MenuItem>
+                  ))}
+              </Menu>
+            </div>
+          ))}
+        </Box>
       </AppBar>
 
-      {/* سلة التسوق */}
+      {/* سلة التسوق Drawer */}
       <Drawer
         anchor="right"
         open={drawerOpen}
@@ -390,198 +426,10 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFr
           sx: { width: cartItems.length === 0 ? "300px" : "400px" },
         }}
       >
-        <Box sx={{ width: "100%", padding: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 2,
-              marginTop: 2,
-            }}
-          >
-            <Avatar
-              alt="Profile Image"
-              src="/path-to-image.jpg"
-              sx={{ width: 40, height: 40 }}
-            />
-            <Typography variant="h6" gutterBottom fontWeight="bold">
-              سلة التسوق
-            </Typography>
-            <IconButton onClick={toggleDrawer}>
-              <HighlightOffIcon sx={{ color: "black", fontSize: "35px" }} />
-            </IconButton>
-          </Box>
-
-          {cartItems.length === 0 ? (
-            <Typography
-              sx={{
-                textAlign: "right",
-                fontSize: "16px",
-                color: "text.secondary",
-              }}
-            >
-              السلة فارغة
-            </Typography>
-          ) : (
-            <div>
-              <List
-                sx={{
-                  width: "100%",
-                  alignItems: "center !important",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                {cartItems.map((item) => (
-                  <ListItem
-                    key={item.id}
-                    sx={{
-                      alignItems: "center !important",
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      padding: "15px 0",
-                      borderBottom: "1px solid #ddd",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        alignItems: "center !important",
-                        display: "flex",
-                        flexGrow: 1,
-                      }}
-                    >
-                      <Avatar
-                        src={item.image}
-                        alt={item.name}
-                        sx={{ width: 80, height: 80, marginRight: 3 }}
-                      />
-                      <Box sx={{ textAlign: "right", marginRight: 2 }}>
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ fontWeight: "bold", fontSize: "14px" }}
-                        >
-                          {item.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          السعر: {item.salary} $
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            border: "1px solid #CECECE",
-                            borderRadius: "5px",
-                            padding: "2px",
-                            marginTop: "5px",
-                            width: "fit-content",
-                          }}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                            disabled={item.quantity <= 1}
-                            sx={{
-                              color: "#1e8234",
-                              "&:hover": {
-                                backgroundColor: "inherit !important",
-                              },
-                            }}
-                          >
-                            -
-                          </IconButton>
-                          <Typography
-                            sx={{
-                              mx: 1,
-                              minWidth: "20px",
-                              textAlign: "center",
-                            }}
-                          >
-                            {item.quantity}
-                          </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                            sx={{
-                              color: "#1e8234",
-                              "&:hover": {
-                                backgroundColor: "inherit !important",
-                              },
-                            }}
-                          >
-                            +
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    </Box>
-                    <IconButton
-                      onClick={() => removeFromCart(item.id)}
-                      sx={{
-                        color: "#E4312C",
-                        "&:hover": {
-                          backgroundColor: "inherit !important",
-                        },
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItem>
-                ))}
-              </List>
-
-              <Box
-                sx={{
-                  marginTop: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Box sx={{ width: "80%" }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    onClick={handlePayment}
-                    sx={{
-                      backgroundColor: "#1e8234",
-                      fontSize: "16px",
-                      borderRadius: "20px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    ادفع: {totalAmount.toFixed(2)} $
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    startIcon={<DeleteSweepIcon />}
-                    onClick={removeAllItems}
-                    sx={{
-                      textTransform: "none",
-                      fontWeight: "bold",
-                      fontSize: "13px",
-                      padding: "8px 16px",
-                      borderRadius: "20px",
-                      gap: "8px",
-                      width: "100%",
-                    }}
-                  >
-                    إزالة الكل
-                  </Button>
-                </Box>
-              </Box>
-            </div>
-          )}
-        </Box>
+        {/* محتوى سلة التسوق هنا */}
       </Drawer>
 
-      {/* المفضلة */}
+      {/* المفضلة Drawer */}
       <Drawer
         anchor="right"
         open={favoritesDrawerOpen}
@@ -591,123 +439,7 @@ const Navbar = ({ cartItems, updateQuantity, removeFromCart, favorites, removeFr
           sx: { width: favorites.length === 0 ? "300px" : "400px" },
         }}
       >
-        <Box sx={{ width: "100%", padding: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 2,
-              marginTop: 2,
-            }}
-          >
-            <Typography variant="h6" gutterBottom fontWeight="bold">
-              المفضلة
-            </Typography>
-            <IconButton onClick={toggleFavoritesDrawer}>
-              <HighlightOffIcon sx={{ color: "black", fontSize: "35px" }} />
-            </IconButton>
-          </Box>
-
-          {favorites.length === 0 ? (
-            <Typography
-              sx={{
-                textAlign: "right",
-                fontSize: "16px",
-                color: "text.secondary",
-              }}
-            >
-              لا توجد عناصر في المفضلة
-            </Typography>
-          ) : (
-            <div>
-              <List
-                sx={{
-                  width: "100%",
-                  alignItems: "center !important",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                {favorites.map((item) => (
-                  <ListItem
-                    key={item.id}
-                    sx={{
-                      alignItems: "center !important",
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      padding: "15px 0",
-                      borderBottom: "1px solid #ddd",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        alignItems: "center !important",
-                        display: "flex",
-                        flexGrow: 1,
-                      }}
-                    >
-                      <Avatar
-                        src={item.image}
-                        alt={item.name}
-                        sx={{ width: 80, height: 80, marginRight: 3 }}
-                      />
-                      <Box sx={{ textAlign: "right", marginRight: 2 }}>
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ fontWeight: "bold", fontSize: "14px" }}
-                        >
-                          {item.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          السعر: {item.salary} $
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <IconButton
-                      onClick={() => removeFromFavorites(item.id)}
-                      sx={{
-                        color: "#E4312C",
-                        "&:hover": {
-                          backgroundColor: "inherit !important",
-                        },
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItem>
-                ))}
-              </List>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  marginTop: 2,
-                }}
-              >
-                <Button
-                    variant="contained"
-                    color="error"
-                    onClick={clearFavorites}
-                    startIcon={<DeleteSweepIcon />}
-                    sx={{
-                      textTransform: "none",
-                      fontWeight: "bold",
-                      fontSize: "13px",
-                      padding: "8px 16px",
-                      borderRadius: "20px",
-                      gap: "8px",
-                      width: "100%",
-                    }}
-                  >
-                    إزالة الكل
-                  </Button>
-              </Box>
-            </div>
-          )}
-        </Box>
+        {/* محتوى المفضلة هنا */}
       </Drawer>
     </>
   );
