@@ -7,6 +7,13 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToFavorites,
+  removeFromFavorites,
+  removeAllFromFavorites,
+} from "./STORE/SLICE/favSlice/favAction";
+import { selectFavorites } from "./STORE/SLICE/favSlice/favSlice";
 import Navbar from "./components/navbar/nav";
 import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
@@ -25,92 +32,53 @@ const AppContent = () => {
   const [cartItems, setCartItems] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const favorites = useSelector(selectFavorites);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [favorites, setFavorites] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
+  const isLoggedIn = !!localStorage.getItem("authToken");
 
-  const addToFavorites = (product) => {
-    if (!favorites.some((fav) => fav.id === product.id)) {
-      setFavorites([...favorites, product]);
-    }
-  };
-
-  const removeFromFavorites = (productId) => {
-    setFavorites(favorites.filter((fav) => fav.id !== productId));
-  };
-
-  const clearFavorites = () => {
-    setFavorites([]);
-  };
-
-  const handleAddToCart = (item) => {
+  const handleAddToFavorites = (product) => {
     if (!isLoggedIn) {
       navigate("/login");
       return;
     }
-    addToCart(item);
+    dispatch(addToFavorites(product.id)); // إضافة المنتج إلى المفضلة
+    console.log("📋 المفضلة الحالية:", favorites); // طباعة المفضلات في الكونسول
   };
 
-  const handleAddToFavorites = (item) => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-    addToFavorites(item);
+  const handleRemoveFromFavorites = (productId) => {
+    dispatch(removeFromFavorites(productId)); // إزالة المنتج من المفضلة
+    console.log("📋 المفضلة الحالية:", favorites); // طباعة المفضلات في الكونسول
+  };
+
+  const handleClearFavorites = () => {
+    dispatch(removeAllFromFavorites()); // إزالة جميع المنتجات من المفضلة
+    console.log("📋 المفضلة الحالية:", favorites); // طباعة المفضلات في الكونسول
   };
 
   const updateCategories = (categories) => {
-    setCategories(categories);
+    setCategories(categories); // تحديث قائمة الفئات
   };
 
-  const addToCart = (item) => {
-    setCartItems((prev) => {
-      const existingItem = prev.find((cartItem) => cartItem.id === item.id);
-      if (existingItem) {
-        return prev.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
-    });
-  };
-
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const updateQuantity = (id, newQuantity) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+  const navigateToCategory = (categoryName, products) => {
+    setProducts(products); // تحديث قائمة المنتجات عند الانتقال إلى الفئة
+    navigate(`/category/${categoryName}`, { state: { products } });
   };
 
   const isLoginPage =
     location.pathname === "/login" || location.pathname === "/register";
-
-  const navigateToCategory = (categoryName, products) => {
-    setProducts(products);
-    navigate(`/category/${categoryName}`, { state: { products } });
-  };
 
   return (
     <>
       {!isLoginPage && (
         <Navbar
           cartItems={cartItems}
-          updateQuantity={updateQuantity}
-          removeFromCart={removeFromCart}
           categories={categories}
           favorites={favorites}
-          removeFromFavorites={removeFromFavorites}
-          clearFavorites={clearFavorites}
-          addToCart={addToCart}
-          addToFavorites={addToFavorites}
+          removeFromFavorites={handleRemoveFromFavorites}
+          clearFavorites={handleClearFavorites}
+          addToFavorites={handleAddToFavorites} // التأكد من تمرير الدالة
         />
       )}
 
@@ -121,12 +89,9 @@ const AppContent = () => {
             <>
               <Hero />
               <CategorySection
-                addToCart={addToCart}
-                addToFavorites={addToFavorites}
-                removeFromFavorites={removeFromFavorites}
+                addToFavorites={handleAddToFavorites} // التأكد من تمرير الدالة
+                removeFromFavorites={handleRemoveFromFavorites}
                 favorites={favorites}
-                handleAddToCart={handleAddToCart}
-                handleAddToFavorites={handleAddToFavorites}
                 updateCategories={updateCategories}
                 navigateToCategory={navigateToCategory}
               />
@@ -137,12 +102,9 @@ const AppContent = () => {
           path="/category/:categoryName"
           element={
             <SelectActionCard
-              addToCart={addToCart}
-              addToFavorites={addToFavorites}
-              removeFromFavorites={removeFromFavorites}
+              addToFavorites={handleAddToFavorites} // التأكد من تمرير الدالة
+              removeFromFavorites={handleRemoveFromFavorites}
               favorites={favorites}
-              handleAddToCart={handleAddToCart}
-              handleAddToFavorites={handleAddToFavorites} 
               categories={categories}
               products={location.state?.products || []}
             />

@@ -1,7 +1,10 @@
 import * as React from "react";
-import { useParams, useLocation } from "react-router-dom";
-import { categories } from "../data/data";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../../STORE/SLICE/productSlice/productsAction";
+import { fetchCategories } from "../../STORE/SLICE/mainCategory/mainCategoryAction";
+import { fetchSubCategories } from "../../STORE/SLICE/subCategory/subCategoryAction";
 import {
   Typography,
   Card,
@@ -23,35 +26,55 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 function SelectActionCard({
-  addToCart,
-  addToFavorites,
-  removeFromFavorites,
-  favorites,
   handleAddToCart,
   handleAddToFavorites,
+  removeFromFavorites,
+  favorites,
 }) {
   const { categoryName } = useParams();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const subcategory = queryParams.get("subcategory");
 
+  const dispatch = useDispatch();
+  const { products, loading, error } = useSelector((state) => state.products);
+  const { categories } = useSelector((state) => state.categories);
+  const { subCategories } = useSelector((state) => state.subCategories);
   const [openCategories, setOpenCategories] = React.useState({});
+  const [currentCategory, setCurrentCategory] = useState(null);
+  const currentCategoryName =
+    categories?.data?.length > 0
+      ? categories.data.find((cat) => cat.title === categoryName)?.name ||
+        categoryName
+      : categoryName;
 
-  const handleToggle = (categoryTitle) => {
+  const currentSubcategoryName =
+    subCategories?.data?.find((sub) => sub.name === subcategory)?.name ||
+    subcategory;
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchSubCategories());
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  const handleToggle = (categoryId) => {
     setOpenCategories((prev) => ({
       ...prev,
-      [categoryTitle]: !prev[categoryTitle],
+      [categoryId]: !prev[categoryId],
     }));
   };
 
-  const products =
-    !categoryName || categoryName === "all"
-      ? categories.flatMap((category) => category.items)
-      : categories
-          .find((category) => category.title === categoryName)
-          ?.items.filter((item) =>
-            subcategory ? item.subcategory === subcategory : true
-          ) || [];
+  const filteredProducts = Array.isArray(products.products)
+    ? products.products.filter((product) => {
+        if (categoryName === "all") return true;
+        return (
+          product.category?.id === categoryName &&
+          (!subcategory ||
+            product.subcategory?.toLowerCase() === subcategory?.toLowerCase())
+        );
+      })
+    : [];
 
   const isFavorite = (productId) =>
     favorites.some((fav) => fav.id === productId);
@@ -89,39 +112,36 @@ function SelectActionCard({
             />
           </ListItemButton>
           <Divider />
-          {categories.map((category, index) => (
-            <div key={index}>
-              <ListItemButton onClick={() => handleToggle(category.title)}>
+          {categories?.data?.map((category) => (
+            <div key={category.id}>
+              <ListItemButton onClick={() => handleToggle(category.id)}>
                 <ListItemText
-                  primary={category.title}
+                  primary={category.name}
                   sx={{ textAlign: "center", fontSize: "14px" }}
                 />
-                {openCategories[category.title] ? (
-                  <ExpandLess />
-                ) : (
-                  <ExpandMore />
-                )}
+                {openCategories[category.id] ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
               <Collapse
-                in={openCategories[category.title]}
+                in={openCategories[category.id]}
                 timeout="auto"
                 unmountOnExit
-                sx={{ transition: "max-height 0.3s ease-in-out" }}
               >
                 <List component="div" disablePadding>
-                  {category.subcategories?.map((subcategory, subIndex) => (
-                    <ListItemButton
-                      key={subIndex}
-                      component={Link}
-                      to={`/category/${category.title}?subcategory=${subcategory}`}
-                      sx={{ pl: 4, fontSize: "13px" }}
-                    >
-                      <ListItemText
-                        primary={subcategory}
-                        sx={{ textAlign: "center" }}
-                      />
-                    </ListItemButton>
-                  ))}
+                  {subCategories?.data
+                    ?.filter((sub) => sub.category_id === category.id)
+                    .map((sub) => (
+                      <ListItemButton
+                        key={sub.id}
+                        component={Link}
+                        to={`/category/${category.id}?subcategory=${sub.name}`}
+                        sx={{ pl: 4, fontSize: "13px" }}
+                      >
+                        <ListItemText
+                          primary={sub.name}
+                          sx={{ textAlign: "center" }}
+                        />
+                      </ListItemButton>
+                    ))}
                 </List>
               </Collapse>
               <Divider />
@@ -134,16 +154,13 @@ function SelectActionCard({
         <Box sx={{ padding: "16px", textAlign: "right" }}>
           <Typography
             variant="h4"
-            sx={{
-              fontSize: "18px",
-              fontWeight: "bold",
-              marginBottom: "16px",
-              direction: "rtl",
-            }}
+            sx={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px" }}
           >
             الرئيسية &gt; جميع المنتجات
-            {categoryName && categoryName !== "all" ? ` > ${categoryName}` : ""}
-            {subcategory ? ` > ${subcategory}` : ""}
+            {currentCategoryName && currentCategoryName !== "all"
+              ? ` > ${currentCategoryName}`
+              : ""}
+            {currentSubcategoryName ? ` > ${currentSubcategoryName}` : ""}
           </Typography>
         </Box>
         <Box
@@ -156,91 +173,75 @@ function SelectActionCard({
             gap: 2,
           }}
         >
-          {products.map((product) => (
-            <Card
-              key={product.id}
-              sx={{
-                maxWidth: 240,
-                margin: "0 auto",
-                borderRadius: "10px",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                transition: "transform 0.3s ease",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
-                },
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="160"
-                image={product.image}
-                alt={product.name}
-                sx={{
-                  objectFit: "contain",
-                  padding: "10px",
-                  borderRadius: "10px",
-                }}
-              />
-              <CardContent>
-                <Typography
-                  variant="body1"
-                  gutterBottom
-                  fontWeight="bold"
-                  sx={{
-                    fontSize: "14px",
-                    textAlign: "center",
-                    color: "#34495e",
-                  }}
-                >
-                  {product.name}
-                </Typography>
-                <Typography
-                  variant="h6"
-                  sx={{ color: "#555", fontSize: "16px", textAlign: "center" }}
-                >
-                  {product.salary} $
-                </Typography>
-                <Box textAlign="center" mt={2}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => handleAddToCart(product)}
-                    sx={{
-                      borderRadius: "50px",
-                      padding: "8px 20px",
-                      textTransform: "none",
-                      fontWeight: "bold",
-                      backgroundColor: "#27ae60",
-                      "&:hover": {
-                        backgroundColor: "#219653",
-                      },
-                    }}
-                  >
-                    أضف إلى السلة
-                  </Button>
-                  <IconButton
-                    onClick={() =>
-                      isFavorite(product.id)
-                        ? removeFromFavorites(product.id)
-                        : handleAddToFavorites(product)
-                    }
-                    sx={{ marginTop: "10px" }}
-                  >
-                    {isFavorite(product.id) ? (
-                      <FavoriteIcon sx={{ color: "red" }} />
-                    ) : (
-                      <FavoriteBorderIcon />
-                    )}
-                  </IconButton>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+          {loading ? (
+            <Typography variant="h6">جاري تحميل المنتجات...</Typography>
+          ) : error ? (
+            <Typography variant="h6" color="error">
+              فشل جلب المنتجات: {error}
+            </Typography>
+          ) : filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <Card
+                key={product.id}
+                sx={{ maxWidth: 240, margin: "0 auto", borderRadius: "10px" }}
+              >
+                <CardMedia
+                  component="img"
+                  height="160"
+                  image={product.image}
+                  alt={product.name}
+                />
+                <CardContent>
+                  <Typography variant="body1" fontWeight="bold">
+                    {product.name}
+                  </Typography>
+                  <Typography variant="h6">{product.price} $</Typography>
+                  <Box textAlign="center" mt={2}>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      أضف إلى السلة
+                    </Button>
+                    <IconButton
+                      onClick={() =>
+                        isFavorite(product.id)
+                          ? removeFromFavorites(product.id)
+                          : handleAddToFavorites(product)
+                      }
+                    >
+                      {isFavorite(product.id) ? (
+                        <FavoriteIcon sx={{ color: "red" }} />
+                      ) : (
+                        <FavoriteBorderIcon />
+                      )}
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Typography variant="h6">لا توجد منتجات لعرضها</Typography>
+          )}
         </Box>
       </Box>
     </Box>
   );
 }
+AddCustomer.propTypes = {
+  initialRows: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string, // اسم العميل
+      gender: PropTypes.string, // الجنس
+      mobile: PropTypes.string, // رقم الجوال
+      email: PropTypes.string, // البريد الإلكتروني
+      dateOfBirth: PropTypes.string, // تاريخ الميلاد
+      products: PropTypes.array, // قائمة المنتجات
+    })
+  ).isRequired,
+  onAddCustomer: PropTypes.func.isRequired,
+};
 
 export default SelectActionCard;
