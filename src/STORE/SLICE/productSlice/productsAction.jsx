@@ -23,14 +23,17 @@ export const fetchProductscategory = createAsyncThunk(
       const response = await axiosFetching.get(
         `/products/category/${categoryId}`
       );
-      return response.data; // إرجاع البيانات بنجاح
+      console.log(`✅ المنتجات لتصنيف ${categoryId}:`, response.data.products);
+      return { categoryId, products: response.data.products }; // تخزين حسب التصنيف
     } catch (error) {
+      console.error("❌ خطأ في جلب المنتجات:", error);
       return rejectWithValue(
         error.response?.data?.message || "فشل جلب المنتجات"
       );
     }
   }
 );
+
 export const fetchProductsSUBcategory = createAsyncThunk(
   "products/fetchProductsSUBcategory",
   async (SubcategoryId, { rejectWithValue }) => {

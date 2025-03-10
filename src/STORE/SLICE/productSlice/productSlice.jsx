@@ -1,8 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchProducts, fetchProductscategory, fetchProductsSUBcategory } from "./productsAction"; // استيراد الـ actions
+import {
+  fetchProducts,
+  fetchProductscategory,
+  fetchProductsSUBcategory,
+} from "./productsAction"; // استيراد الـ actions
 
 // الحالة الأولية للمجموعة (state)
 const initialState = {
+  data: {},
   products: [], // لاحتواء المنتجات
   loading: false, // حالة تحميل البيانات
   error: null, // حالة الخطأ
@@ -38,8 +43,7 @@ const productsSlice = createSlice({
     });
     builder.addCase(fetchProductscategory.fulfilled, (state, action) => {
       state.loading = false;
-      state.categoryProducts = action.payload; // إضافة المنتجات الخاصة بالفئة
-      state.error = null;
+      state.data[action.payload.categoryId] = action.payload.products;
     });
     builder.addCase(fetchProductscategory.rejected, (state, action) => {
       state.loading = false;
