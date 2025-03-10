@@ -38,28 +38,31 @@ const AppContent = () => {
   const [products, setProducts] = useState([]);
   const isLoggedIn = !!localStorage.getItem("authToken");
 
+  // ✅ إضافة المنتج إلى المفضلة
   const handleAddToFavorites = (product) => {
     if (!isLoggedIn) {
-      navigate("/login");
+      navigate("/login"); // توجيه المستخدم لتسجيل الدخول
       return;
     }
-    dispatch(addToFavorites(product.id)); // Adding product to favorites
+    dispatch(addToFavorites(product)); // إضافة المنتج للمفضلة
   };
 
+  // ✅ إزالة المنتج من المفضلة
   const handleRemoveFromFavorites = (productId) => {
-    dispatch(removeFromFavorites(productId)); // Removing product from favorites
+    dispatch(removeFromFavorites(productId)); // إزالة المنتج من المفضلة
   };
 
+  // ✅ مسح جميع المنتجات من المفضلة
   const handleClearFavorites = () => {
-    dispatch(removeAllFromFavorites()); // Clear all products from favorites
+    dispatch(removeAllFromFavorites()); // مسح جميع المنتجات من المفضلة
   };
 
   const updateCategories = (categories) => {
-    setCategories(categories); // Update category list
+    setCategories(categories); // تحديث قائمة الفئات
   };
 
   const navigateToCategory = (categoryName, products) => {
-    setProducts(products); // Update products when navigating to a category
+    setProducts(products); // تحديث المنتجات عند تغيير الفئة
     navigate(`/category/${categoryName}`, { state: { products } });
   };
 

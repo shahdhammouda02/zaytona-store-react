@@ -6,6 +6,7 @@ import {
   fetchProductsSUBcategory,
   fetchProducts,
 } from "../../STORE/SLICE/productSlice/productsAction";
+import { fetchSearchResults } from "../../STORE/SLICE/seaechslice/searchAction";
 import {
   Typography,
   Card,
