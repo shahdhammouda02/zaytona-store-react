@@ -1,247 +1,220 @@
-import * as React from "react";
-import { useState, useEffect, useMemo } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../../STORE/SLICE/productSlice/productsAction";
-import { fetchCategories } from "../../STORE/SLICE/mainCategory/mainCategoryAction";
-import { fetchSubCategories } from "../../STORE/SLICE/subCategory/subCategoryAction";
+import React from "react";
 import {
+  Grid,
   Typography,
   Card,
   CardContent,
   CardMedia,
   Box,
   Button,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
-  Divider,
   IconButton,
-  Collapse,
 } from "@mui/material";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import { Link } from "react-router-dom";
+import categorybg from "../../assets/images/categorybg.jpg";
+import { categories } from "../data/data";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
-function SelectActionCard({
-  handleAddToCart,
-  handleAddToFavorites,
+const CategorySection = ({
+  addToCart,
+  addToFavorites,
   removeFromFavorites,
   favorites,
-}) {
-  const { categoryName } = useParams();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const subcategory = queryParams.get("subcategory");
-
-  const dispatch = useDispatch();
-  const { products, loading, error } = useSelector((state) => state.products);
-  const { categories } = useSelector((state) => state.categories);
-  const { subCategories } = useSelector((state) => state.subCategories);
-  const [openCategories, setOpenCategories] = React.useState({});
-  const [currentCategory, setCurrentCategory] = useState(null);
-  const currentCategoryName =
-    categories?.data?.length > 0
-      ? categories.data.find((cat) => cat.title === categoryName)?.name ||
-        categoryName
-      : categoryName;
-
-  const currentSubcategoryName =
-    subCategories?.data?.find((sub) => sub.name === subcategory)?.name ||
-    subcategory;
-
-  useEffect(() => {
-    dispatch(fetchCategories());
-    dispatch(fetchSubCategories());
-    dispatch(fetchProducts());
-  }, [dispatch]);
-
-  const handleToggle = (categoryId) => {
-    setOpenCategories((prev) => ({
-      ...prev,
-      [categoryId]: !prev[categoryId],
-    }));
-  };
-
-  const filteredProducts = Array.isArray(products.products)
-    ? products.products.filter((product) => {
-        if (categoryName === "all") return true;
-        return (
-          product.category?.id === categoryName &&
-          (!subcategory ||
-            product.subcategory?.toLowerCase() === subcategory?.toLowerCase())
-        );
-      })
-    : [];
-
-  const isFavorite = (productId) =>
-    favorites.some((fav) => fav.id === productId);
-
+  handleAddToCart, // استقبال الدالة الجديدة
+  handleAddToFavorites, // استقبال الدالة الجديدة
+}) => {
   return (
     <Box
       sx={{
+        backgroundImage: `url(${categorybg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
         width: "100%",
-        display: "flex",
-        backgroundColor: "#FCF9F6",
-        paddingTop: "30px",
+        padding: "80px 0px",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        backgroundBlendMode: "overlay",
       }}
     >
-      <Drawer
-        variant="permanent"
-        anchor="right"
-        sx={{
-          width: 240,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            position: "static",
-            width: 240,
-            boxSizing: "border-box",
-            height: "auto",
-            maxHeight: "calc(100vh - 310px)",
-            top: "310px",
-          },
-        }}
-      >
-        <List>
-          <ListItemButton component={Link} to={`/category/all`}>
-            <ListItemText
-              primary="جميع المنتجات"
-              sx={{ textAlign: "center", fontWeight: "bold", fontSize: "14px" }}
-            />
-          </ListItemButton>
-          <Divider />
-          {categories?.data?.map((category) => (
-            <div key={category.id}>
-              <ListItemButton onClick={() => handleToggle(category.id)}>
-                <ListItemText
-                  primary={category.name}
-                  sx={{ textAlign: "center", fontSize: "14px" }}
-                />
-                {openCategories[category.id] ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-              <Collapse
-                in={openCategories[category.id]}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  {subCategories?.data
-                    ?.filter((sub) => sub.category_id === category.id)
-                    .map((sub) => (
-                      <ListItemButton
-                        key={sub.id}
-                        component={Link}
-                        to={`/category/${category.id}?subcategory=${sub.name}`}
-                        sx={{ pl: 4, fontSize: "13px" }}
-                      >
-                        <ListItemText
-                          primary={sub.name}
-                          sx={{ textAlign: "center" }}
-                        />
-                      </ListItemButton>
-                    ))}
-                </List>
-              </Collapse>
-              <Divider />
-            </div>
-          ))}
-        </List>
-      </Drawer>
-
-      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        <Box sx={{ padding: "16px", textAlign: "right" }}>
-          <Typography
-            variant="h4"
-            sx={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px" }}
+      <Box>
+        {categories.map((category, index) => (
+          <Box
+            key={index}
+            sx={{
+              background: "#FCF9F6",
+              padding: "30px 0",
+              borderRadius: "10px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+              marginBottom: "40px",
+            }}
           >
-            الرئيسية &gt; جميع المنتجات
-            {currentCategoryName && currentCategoryName !== "all"
-              ? ` > ${currentCategoryName}`
-              : ""}
-            {currentSubcategoryName ? ` > ${currentSubcategoryName}` : ""}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            flex: 1,
-            padding: "50px",
-            paddingTop: "0px",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-            gap: 2,
-          }}
-        >
-          {loading ? (
-            <Typography variant="h6">جاري تحميل المنتجات...</Typography>
-          ) : error ? (
-            <Typography variant="h6" color="error">
-              فشل جلب المنتجات: {error}
+            <Typography
+              variant="h4"
+              gutterBottom
+              textAlign="center"
+              fontWeight="bold"
+              sx={{ marginBottom: "20px", color: "#2c3e50" }}
+            >
+              {category.title}
             </Typography>
-          ) : filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <Card
-                key={product.id}
-                sx={{ maxWidth: 240, margin: "0 auto", borderRadius: "10px" }}
+
+            <Grid
+              container
+              spacing={4}
+              alignItems="center"
+              width={"100% !important"}
+            >
+              <Grid item xs={12} sm={12} md={3}>
+                <Card
+                  sx={{
+                    width: "350px",
+                    height: "400px",
+                    borderRadius: "74px 0px 0px 74px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      transform: "scale(1.03)",
+                    },
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    image={category.banner}
+                    alt={category.title}
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Card>
+              </Grid>
+
+              {category.items.slice(0, 3).map((item) => (
+                <Grid item xs={12} sm={6} md={3} key={item.id}>
+                  <Card
+                    sx={{
+                      maxWidth: 240,
+                      margin: "0 auto",
+                      borderRadius: "10px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                      transition: "transform 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
+                      },
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="160"
+                      image={item.image}
+                      alt={item.name}
+                      sx={{
+                        objectFit: "contain",
+                        padding: "10px",
+                        borderRadius: "10px",
+                      }}
+                    />
+                    <CardContent>
+                      <Typography
+                        variant="body1"
+                        gutterBottom
+                        fontWeight="bold"
+                        sx={{
+                          fontSize: "14px",
+                          textAlign: "center",
+                          color: "#34495e",
+                        }}
+                      >
+                        {item.name}
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#555",
+                          fontSize: "16px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {item.salary} $
+                      </Typography>
+                      <Box textAlign="center" mt={2}>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          onClick={() => handleAddToCart(item)} // استخدام الدالة الجديدة
+                          sx={{
+                            borderRadius: "50px",
+                            padding: "8px 20px",
+                            textTransform: "none",
+                            fontWeight: "bold",
+                            backgroundColor: "#27ae60",
+                            "&:hover": {
+                              backgroundColor: "#219653",
+                            },
+                          }}
+                        >
+                          أضف إلى السلة
+                        </Button>
+                        <IconButton
+                          onClick={
+                            () =>
+                              favorites.some((fav) => fav.id === item.id)
+                                ? removeFromFavorites(item.id)
+                                : handleAddToFavorites(item) // استخدام الدالة الجديدة
+                          }
+                          sx={{
+                            color: favorites.some((fav) => fav.id === item.id)
+                              ? "#E4312C"
+                              : "inherit",
+                          }}
+                        >
+                          {favorites.some((fav) => fav.id === item.id) ? (
+                            <FavoriteIcon />
+                          ) : (
+                            <FavoriteBorderIcon />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+            {/* زر تسوق الآن */}
+            <Box textAlign="center" marginBottom="20px">
+              <Link
+                to={`/category/${category.title}`}
+                state={{ products: category.items }}
+                style={{ textDecoration: "none" }}
               >
-                <CardMedia
-                  component="img"
-                  height="160"
-                  image={product.image}
-                  alt={product.name}
-                />
-                <CardContent>
-                  <Typography variant="body1" fontWeight="bold">
-                    {product.name}
-                  </Typography>
-                  <Typography variant="h6">{product.price} $</Typography>
-                  <Box textAlign="center" mt={2}>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      أضف إلى السلة
-                    </Button>
-                    <IconButton
-                      onClick={() =>
-                        isFavorite(product.id)
-                          ? removeFromFavorites(product.id)
-                          : handleAddToFavorites(product)
-                      }
-                    >
-                      {isFavorite(product.id) ? (
-                        <FavoriteIcon sx={{ color: "red" }} />
-                      ) : (
-                        <FavoriteBorderIcon />
-                      )}
-                    </IconButton>
-                  </Box>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Typography variant="h6">لا توجد منتجات لعرضها</Typography>
-          )}
-        </Box>
+                <Button
+                  variant="contained"
+                  sx={{
+                    width: "170px !important",
+                    borderRadius: "50px",
+                    padding: "10px 30px",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    whiteSpace: "nowrap",
+                    backgroundColor: "#1e8234",
+                    "&:hover": {
+                      backgroundColor: "#e4312c",
+                    },
+                  }}
+                >
+                  عرض جميع المنتجات
+                </Button>
+              </Link>
+            </Box>
+          </Box>
+        ))}
       </Box>
     </Box>
   );
-}
-AddCustomer.propTypes = {
-  initialRows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string, // اسم العميل
-      gender: PropTypes.string, // الجنس
-      mobile: PropTypes.string, // رقم الجوال
-      email: PropTypes.string, // البريد الإلكتروني
-      dateOfBirth: PropTypes.string, // تاريخ الميلاد
-      products: PropTypes.array, // قائمة المنتجات
-    })
-  ).isRequired,
-  onAddCustomer: PropTypes.func.isRequired,
 };
 
-export default SelectActionCard;
+export default CategorySection;

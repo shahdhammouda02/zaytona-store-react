@@ -1,10 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  fetchCategories,
-  addCategory,
-  updateCategory,
-  deleteCategory,
-} from "./mainCategoryAction"; // Import actions
+import { fetchCategories } from "./mainCategoryAction"; // Import actions
 
 const initialState = {
   categories: [],
@@ -29,8 +24,8 @@ const categoriesSlice = createSlice({
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "فشل جلب الفئات";
-        console.error("Error fetching categories:", action.error.message);
+        state.error = action.error?.message || "فشل جلب الفئات";
+        console.error("Error fetching categories:", action.error);
       });
   },
 });
