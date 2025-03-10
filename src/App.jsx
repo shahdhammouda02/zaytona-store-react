@@ -43,26 +43,23 @@ const AppContent = () => {
       navigate("/login");
       return;
     }
-    dispatch(addToFavorites(product.id)); // إضافة المنتج إلى المفضلة
-    console.log("📋 المفضلة الحالية:", favorites); // طباعة المفضلات في الكونسول
+    dispatch(addToFavorites(product.id)); // Adding product to favorites
   };
 
   const handleRemoveFromFavorites = (productId) => {
-    dispatch(removeFromFavorites(productId)); // إزالة المنتج من المفضلة
-    console.log("📋 المفضلة الحالية:", favorites); // طباعة المفضلات في الكونسول
+    dispatch(removeFromFavorites(productId)); // Removing product from favorites
   };
 
   const handleClearFavorites = () => {
-    dispatch(removeAllFromFavorites()); // إزالة جميع المنتجات من المفضلة
-    console.log("📋 المفضلة الحالية:", favorites); // طباعة المفضلات في الكونسول
+    dispatch(removeAllFromFavorites()); // Clear all products from favorites
   };
 
   const updateCategories = (categories) => {
-    setCategories(categories); // تحديث قائمة الفئات
+    setCategories(categories); // Update category list
   };
 
   const navigateToCategory = (categoryName, products) => {
-    setProducts(products); // تحديث قائمة المنتجات عند الانتقال إلى الفئة
+    setProducts(products); // Update products when navigating to a category
     navigate(`/category/${categoryName}`, { state: { products } });
   };
 
@@ -78,7 +75,7 @@ const AppContent = () => {
           favorites={favorites}
           removeFromFavorites={handleRemoveFromFavorites}
           clearFavorites={handleClearFavorites}
-          addToFavorites={handleAddToFavorites} // التأكد من تمرير الدالة
+          addToFavorites={handleAddToFavorites}
         />
       )}
 
@@ -89,7 +86,7 @@ const AppContent = () => {
             <>
               <Hero />
               <CategorySection
-                addToFavorites={handleAddToFavorites} // التأكد من تمرير الدالة
+                addToFavorites={handleAddToFavorites}
                 removeFromFavorites={handleRemoveFromFavorites}
                 favorites={favorites}
                 updateCategories={updateCategories}
@@ -99,18 +96,27 @@ const AppContent = () => {
           }
         />
         <Route
-          path="/category/:categoryName"
+          path="/category/:categoryId"
           element={
             <SelectActionCard
-              addToFavorites={handleAddToFavorites} // التأكد من تمرير الدالة
+              addToFavorites={handleAddToFavorites}
               removeFromFavorites={handleRemoveFromFavorites}
               favorites={favorites}
               categories={categories}
-              products={location.state?.products || []}
             />
           }
         />
-
+        <Route
+          path="/subcategory/:subcategoryId"
+          element={
+            <SelectActionCard
+              addToFavorites={handleAddToFavorites}
+              removeFromFavorites={handleRemoveFromFavorites}
+              favorites={favorites}
+              categories={categories}
+            />
+          }
+        />
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
       </Routes>

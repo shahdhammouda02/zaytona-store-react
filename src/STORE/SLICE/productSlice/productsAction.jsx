@@ -10,20 +10,39 @@ export const fetchProducts = createAsyncThunk(
       const response = await axiosFetching.get("/publicProducts");
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "فشل جلب المنتجات");
+      return rejectWithValue(
+        error.response?.data?.message || "فشل جلب المنتجات"
+      );
     }
   }
 );
 export const fetchProductscategory = createAsyncThunk(
   "products/fetchProductscategory",
-  async (id, { rejectWithValue }) => { // id should be passed as a parameter
+  async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await axiosFetching.get(`/products/category/${id}`);
-      return response.data;
+      const response = await axiosFetching.get(
+        `/products/category/${categoryId}`
+      );
+      return response.data; // إرجاع البيانات بنجاح
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "فشل جلب المنتجات");
+      return rejectWithValue(
+        error.response?.data?.message || "فشل جلب المنتجات"
+      );
     }
   }
 );
-
-
+export const fetchProductsSUBcategory = createAsyncThunk(
+  "products/fetchProductsSUBcategory",
+  async (SubcategoryId, { rejectWithValue }) => {
+    try {
+      const response = await axiosFetching.get(
+        `/products/subcategory/${SubcategoryId}`
+      );
+      return response.data; // إرجاع البيانات بنجاح
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "فشل جلب المنتجات"
+      );
+    }
+  }
+);
