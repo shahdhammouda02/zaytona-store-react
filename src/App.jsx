@@ -14,6 +14,7 @@ import {
   removeAllFromFavorites,
 } from "./STORE/SLICE/favSlice/favAction";
 import { selectFavorites } from "./STORE/SLICE/favSlice/favSlice";
+// import { selectCart } from "./STORE/SLICE/cartSlice/cartSlice"; // Import selectCart here
 import Navbar from "./components/navbar/nav";
 import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
@@ -21,11 +22,6 @@ import SelectActionCard from "./components/products/ProductsPage";
 import Footer from "./components/footer/footer";
 import SignIn from "./components/login-logout/SignIn";
 import SignUp from "./components/login-logout/SignUp";
-import {
-  addToCart,
-  fetchcart,
-  checkout,
-} from "./STORE/SLICE/cartSlice/cartAction";
 
 const theme = createTheme({
   typography: {
@@ -34,8 +30,7 @@ const theme = createTheme({
 });
 
 const AppContent = () => {
-  const cartItems = useSelector(selectCart); // جلب بيانات السلة من Redux
-
+  const [cartItems, setCartItems] = useState([]); // Fetch cart data from Redux
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -45,18 +40,13 @@ const AppContent = () => {
 
   const isLoggedIn = !!localStorage.getItem("authToken");
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      dispatch(fetchcart()); // Fetch cart when user is logged in
-    }
-  }, [dispatch, isLoggedIn]);
-  useEffect(() => {
-    if (isLoggedIn) {
-      dispatch(fetchcart()); // جلب السلة عند تسجيل الدخول
-    }
-  }, [dispatch, isLoggedIn]);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     dispatch(fetchcart()); // Fetch cart when user is logged in
+  //   }
+  // }, [dispatch, isLoggedIn]);
 
-  // ✅ إضافة المنتج إلى المفضلة
+  // ✅ Add product to favorites
   const handleAddToFavorites = (product) => {
     if (!isLoggedIn) {
       navigate("/login");
@@ -64,28 +54,28 @@ const AppContent = () => {
     }
 
     if (!product || !product.id) {
-      console.error("❌ خطأ: المنتج غير صالح أو لا يحتوي على ID!", product);
+      console.error("❌ Error: Invalid product or no ID!", product);
       return;
     }
     dispatch(addToFavorites(product));
   };
 
-  // ✅ إزالة المنتج من المفضلة
+  // ✅ Remove product from favorites
   const handleRemoveFromFavorites = (productId) => {
-    dispatch(removeFromFavorites(productId)); // إزالة المنتج من المفضلة
+    dispatch(removeFromFavorites(productId));
   };
 
-  // ✅ مسح جميع المنتجات من المفضلة
+  // ✅ Clear all products from favorites
   const handleClearFavorites = () => {
-    dispatch(removeAllFromFavorites()); // مسح جميع المنتجات من المفضلة
+    dispatch(removeAllFromFavorites());
   };
 
   const updateCategories = (categories) => {
-    setCategories(categories); // تحديث قائمة الفئات
+    setCategories(categories);
   };
 
   const navigateToCategory = (categoryName, products) => {
-    setProducts(products); // تحديث المنتجات عند تغيير الفئة
+    setProducts(products);
     navigate(`/category/${categoryName}`, { state: { products } });
   };
 
@@ -94,16 +84,16 @@ const AppContent = () => {
       navigate("/login");
       return;
     }
-    dispatch(addToCart(product)); // إضافة المنتج إلى السلة
+    // dispatch(addToCart(product));
   };
 
-  // ✅ عملية الخروج (الدفع)
+  // ✅ Checkout process
   const handleCheckout = () => {
     if (!isLoggedIn) {
       navigate("/login");
       return;
     }
-    dispatch(checkout()); // تنفيذ عملية الدفع
+    // dispatch(checkout());
   };
 
   const isLoginPage =
