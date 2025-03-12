@@ -191,7 +191,7 @@ const CategorySection = ({
                                 <Button
                                   variant="contained"
                                   color="success"
-                                  onClick={() => handleAddToCart(product)} // Use 'product' instead of 'item'
+                                  onClick={() => addToCart(product)} // Use 'product' instead of 'item'
                                   sx={{
                                     borderRadius: "50px",
                                     padding: "8px 20px",

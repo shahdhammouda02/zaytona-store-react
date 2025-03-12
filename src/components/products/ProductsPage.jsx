@@ -32,6 +32,7 @@ const SelectActionCard = ({
   addToFavorites,
   removeFromFavorites,
   favorites,
+  addToCart,
 }) => {
   const { categoryId, subcategoryId } = useParams();
   const [products, setProducts] = useState([]);
@@ -221,7 +222,22 @@ const SelectActionCard = ({
                   </Typography>
                   <Typography variant="h6">{product.price} $</Typography>
                   <Box textAlign="center" mt={2}>
-                    <Button variant="contained" color="success">
+                   
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => addToCart(product)} // Use 'product' instead of 'item'
+                      sx={{
+                        borderRadius: "50px",
+                        padding: "8px 20px",
+                        textTransform: "none",
+                        fontWeight: "bold",
+                        backgroundColor: "#27ae60",
+                        "&:hover": {
+                          backgroundColor: "#219653",
+                        },
+                      }}
+                    >
                       أضف إلى السلة
                     </Button>
                     <IconButton

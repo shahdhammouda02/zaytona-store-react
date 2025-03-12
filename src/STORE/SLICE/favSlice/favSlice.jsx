@@ -30,6 +30,7 @@ const favoritesSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      
       .addCase(addToFavorites.fulfilled, (state, action) => {
         state.favorites.push(action.payload);
       })

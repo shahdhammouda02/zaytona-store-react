@@ -1,68 +1,92 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addToCart, fetchcart, checkout } from "./cartAction";
+import {
+  fetchcart,
+  addToCart,
+  removeFromcart,
+  removeAllFromCart,
+  checkout,
+} from "./cartAction";
 
 const initialState = {
-  cart: [],
-  isLoading: false,
+  cartItems: [],
+  loading: false,
   error: null,
-  success: false,
-  items: [], 
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
-  reducers: {
-    resetCart: (state) => {
-      state.cart = [];
-      state.error = null;
-      state.success = false;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(addToCart.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(addToCart.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.cart.push(action.payload); // تحديث السلة بإضافة المنتج
-        state.success = true;
-        state.error = null;
-      })
-      .addCase(addToCart.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-        state.success = false;
-      })
+      // Fetch cart
       .addCase(fetchcart.pending, (state) => {
-        state.isLoading = true;
+        state.loading = true;
+        state.error = null;
       })
       .addCase(fetchcart.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.cart = action.payload; // تعيين المنتجات الموجودة في السلة من الـ API
-        state.error = null;
+        state.loading = false;
+    
       })
       .addCase(fetchcart.rejected, (state, action) => {
-        state.isLoading = false;
+        state.loading = false;
         state.error = action.payload;
       })
+
+      // Add to cart
+      .addCase(addToCart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addToCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cartItems.push(action.payload);
+      })
+      .addCase(addToCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Remove from cart
+      .addCase(removeFromcart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(removeFromcart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cartItems = state.cartItems.filter(
+          (item) => item.id !== action.payload
+        );
+      })
+      .addCase(removeFromcart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Remove all from cart
+      .addCase(removeAllFromCart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(removeAllFromCart.fulfilled, (state) => {
+        state.loading = false;
+        state.cartItems = [];
+      })
+      .addCase(removeAllFromCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Checkout
       .addCase(checkout.pending, (state) => {
-        state.isLoading = true;
+        state.loading = true;
       })
       .addCase(checkout.fulfilled, (state) => {
-        state.isLoading = false;
-        state.cart = []; // تفريغ السلة بعد الشراء
-        state.success = true;
-        state.error = null;
+        state.loading = false;
+        state.cartItems = [];
       })
       .addCase(checkout.rejected, (state, action) => {
-        state.isLoading = false;
-        state.success = false;
+        state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { resetCart } = cartSlice.actions;
 export default cartSlice.reducer;

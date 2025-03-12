@@ -14,7 +14,13 @@ import {
   removeAllFromFavorites,
 } from "./STORE/SLICE/favSlice/favAction";
 import { selectFavorites } from "./STORE/SLICE/favSlice/favSlice";
-// import { selectCart } from "./STORE/SLICE/cartSlice/cartSlice"; // Import selectCart here
+import {
+  fetchcart,
+  addToCart,
+  removeFromcart,
+  removeAllFromCart,
+  checkout,
+} from "./STORE/SLICE/cartSlice/cartAction";
 import Navbar from "./components/navbar/nav";
 import Hero from "./components/hero/hero";
 import CategorySection from "./components/category/CategorySection";
@@ -30,7 +36,7 @@ const theme = createTheme({
 });
 
 const AppContent = () => {
-  const [cartItems, setCartItems] = useState([]); // Fetch cart data from Redux
+ const cartItems = useSelector((state) => state.cart.cartItems); // Fetch cart data from Redux
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -40,11 +46,12 @@ const AppContent = () => {
 
   const isLoggedIn = !!localStorage.getItem("authToken");
 
-  // useEffect(() => {
-  //   if (isLoggedIn) {
-  //     dispatch(fetchcart()); // Fetch cart when user is logged in
-  //   }
-  // }, [dispatch, isLoggedIn]);
+  // Fetch cart items when the user is logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchcart()); // Fetch cart when user is logged in
+    }
+  }, [dispatch, isLoggedIn]);
 
   // ✅ Add product to favorites
   const handleAddToFavorites = (product) => {
@@ -84,7 +91,7 @@ const AppContent = () => {
       navigate("/login");
       return;
     }
-    // dispatch(addToCart(product));
+    dispatch(addToCart({ product, quantity: 1 })); // Assuming quantity is 1 here
   };
 
   // ✅ Checkout process
@@ -93,7 +100,7 @@ const AppContent = () => {
       navigate("/login");
       return;
     }
-    // dispatch(checkout());
+    dispatch(checkout());
   };
 
   const isLoginPage =
@@ -109,6 +116,7 @@ const AppContent = () => {
           removeFromFavorites={handleRemoveFromFavorites}
           clearFavorites={handleClearFavorites}
           addToFavorites={handleAddToFavorites}
+          
         />
       )}
 
@@ -124,6 +132,7 @@ const AppContent = () => {
                 favorites={favorites}
                 updateCategories={updateCategories}
                 navigateToCategory={navigateToCategory}
+                addToCart={handleAddToCart}
               />
             </>
           }
