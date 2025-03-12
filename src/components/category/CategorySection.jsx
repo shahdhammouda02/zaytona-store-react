@@ -191,7 +191,7 @@ const CategorySection = ({
                                 <Button
                                   variant="contained"
                                   color="success"
-                                  onClick={() => handleAddToCart(item)} // استخدام الدالة الجديدة
+                                  onClick={() => handleAddToCart(product)} // Use 'product' instead of 'item'
                                   sx={{
                                     borderRadius: "50px",
                                     padding: "8px 20px",
@@ -208,12 +208,12 @@ const CategorySection = ({
                                 <IconButton
                                   onClick={() =>
                                     isFavorite(product.id)
-                                      ? handleRemoveFromFavorites(product.id)
-                                      : handleAddToFavorites(product)
+                                      ? removeFromFavorites(product.id)
+                                      : addToFavorites(product)
                                   }
                                 >
                                   {isFavorite(product.id) ? (
-                                    <FavoriteIcon color="error" />
+                                    <FavoriteIcon sx={{ color: "red" }} />
                                   ) : (
                                     <FavoriteBorderIcon />
                                   )}
