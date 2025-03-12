@@ -29,13 +29,7 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import logo from "../../assets/images/logo.png";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { Autocomplete, TextField } from "@mui/material";
-import { categories } from "../data/data";
-import {
-  fetchDeliveries,
-  addToFavorites,
-  removeFromFavorites,
-  removeAllFromFavorites,
-} from "../../STORE/SLICE/favSlice/favAction";
+
 import { fetchCategories } from "../../STORE/SLICE/mainCategory/mainCategoryAction"; // استيراد جلب الفئات
 import { fetchSubCategories } from "../../STORE/SLICE/subCategory/subCategoryAction";
 const Search = styled("div")(({ theme }) => ({
@@ -114,7 +108,7 @@ const Navbar = ({
   const toggleFavoritesDrawer = () =>
     setFavoritesDrawerOpen(!favoritesDrawerOpen);
   const totalAmount = (cartItems || []).reduce(
-    (sum, item) => sum + item.salary * item.quantity,
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 
@@ -500,7 +494,7 @@ const Navbar = ({
                           {item.name}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          السعر: {item.salary} $
+                          السعر: {item.price} $
                         </Typography>
                         <Box
                           sx={{
@@ -699,7 +693,7 @@ const Navbar = ({
                           {item.name}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          السعر: {item.salary} $
+                          السعر: {item.price} $
                         </Typography>
                       </Box>
                     </Box>
