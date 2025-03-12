@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // تأكد من استيراد useDispatch
 import {
   fetchProductscategory,
   fetchProductsSUBcategory,
   fetchProducts,
 } from "../../STORE/SLICE/productSlice/productsAction";
-import { fetchSearchResults } from "../../STORE/SLICE/seaechslice/searchAction";
+import {
+  addToFavorites,
+  removeFromFavorites,
+} from "../../STORE/SLICE/favSlice/favAction"; // تأكد من استيراد أكشن المفضلة
+import {
+  addToCart,
+} from "../../STORE/SLICE/cartSlice/cartAction"; // تأكد من استيراد أكشن السلة
 import {
   Typography,
   Card,
@@ -29,18 +35,17 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 const SelectActionCard = ({
-  addToFavorites,
-  removeFromFavorites,
   favorites,
+  addToCart,
+  categories,
+  subCategories,
 }) => {
+  const dispatch = useDispatch(); // إضافة هذا السطر لاستدعاء dispatch
   const { categoryId, subcategoryId } = useParams();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openCategories, setOpenCategories] = useState({});
-  const dispatch = useDispatch();
-  const { categories } = useSelector((state) => state.categories);
-  const { subCategories } = useSelector((state) => state.subCategories);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -49,7 +54,6 @@ const SelectActionCard = ({
         let action;
 
         if (categoryId === "all") {
-          // استدعاء API لجلب جميع المنتجات
           action = await dispatch(fetchProducts());
         } else if (categoryId) {
           action = await dispatch(fetchProductscategory(categoryId));
@@ -57,10 +61,7 @@ const SelectActionCard = ({
           action = await dispatch(fetchProductsSUBcategory(subcategoryId));
         }
 
-        if (
-          action?.payload?.products &&
-          Array.isArray(action.payload.products)
-        ) {
+        if (action?.payload?.products && Array.isArray(action.payload.products)) {
           setProducts(action.payload.products);
         } else {
           throw new Error("البيانات غير صحيحة، يجب أن تكون مصفوفة.");
@@ -74,7 +75,7 @@ const SelectActionCard = ({
     };
 
     loadProducts();
-  }, [categoryId, subcategoryId, dispatch]);
+  }, [categoryId, subcategoryId, dispatch]); // تأكد من إضافة dispatch كـ dependency في useEffect
 
   const handleToggle = (categoryId) => {
     setOpenCategories((prev) => ({
@@ -83,16 +84,25 @@ const SelectActionCard = ({
     }));
   };
 
-  const isFavorite = (productId) =>
-    favorites.some((fav) => fav.id === productId);
+  const handleAddToFavorites = (product) => {
+    dispatch(addToFavorites(product)); // استخدم dispatch هنا لإضافة المنتج إلى المفضلة
+  };
+
+  const handleRemoveFromFavorites = (productId) => {
+    dispatch(removeFromFavorites(productId)); // استخدم dispatch لإزالة المنتج من المفضلة
+  };
+
+  const isFavorite = (productId) => favorites.some((fav) => fav.id === productId);
+
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product)); // استخدم dispatch لإضافة المنتج إلى السلة
+  };
 
   const currentCategoryName =
-    categories?.data?.find((cat) => cat.id === Number(categoryId))?.name ||
-    "جميع المنتجات";
+    categories?.find((cat) => cat.id === Number(categoryId))?.name || "جميع المنتجات";
 
   const currentSubcategoryName =
-    subCategories?.data?.find((sub) => sub.id === Number(subcategoryId))
-      ?.name || "";
+    subCategories?.find((sub) => sub.id === Number(subcategoryId))?.name || "";
 
   if (isLoading) {
     return (
@@ -138,7 +148,7 @@ const SelectActionCard = ({
             />
           </ListItemButton>
           <Divider />
-          {categories?.data?.map((category) => (
+          {categories?.map((category) => (
             <div key={category.id}>
               <ListItemButton
                 onClick={() => handleToggle(category.id)}
@@ -157,7 +167,7 @@ const SelectActionCard = ({
                 unmountOnExit
               >
                 <List component="div" disablePadding>
-                  {subCategories?.data
+                  {subCategories
                     ?.filter((sub) => sub.category_id === category.id)
                     .map((sub) => (
                       <ListItemButton
@@ -221,18 +231,22 @@ const SelectActionCard = ({
                   </Typography>
                   <Typography variant="h6">{product.price} $</Typography>
                   <Box textAlign="center" mt={2}>
-                    <Button variant="contained" color="success">
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => handleAddToCart(product)}
+                    >
                       أضف إلى السلة
                     </Button>
                     <IconButton
                       onClick={() =>
                         isFavorite(product.id)
-                          ? removeFromFavorites(product.id)
-                          : addToFavorites(product)
+                          ? handleRemoveFromFavorites(product.id)
+                          : handleAddToFavorites(product)
                       }
                     >
                       {isFavorite(product.id) ? (
-                        <FavoriteIcon sx={{ color: "red" }} />
+                        <FavoriteIcon color="error" />
                       ) : (
                         <FavoriteBorderIcon />
                       )}

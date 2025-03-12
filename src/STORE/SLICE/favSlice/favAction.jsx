@@ -17,11 +17,14 @@ export const fetchFavorites = createAsyncThunk(
 
 export const addToFavorites = createAsyncThunk(
   "favorites/addToFavorites",
-  async (productId, { rejectWithValue }) => {
+  async (product, { rejectWithValue }) => {
     try {
-      const response = await axiosFetching.post("/favorites", { productId });
-      return response.data;
+      const response = await axiosFetching.post("/favorites", {
+        product_id: product.id,
+      });
+      return product; // Ensure this is returned
     } catch (error) {
+      // Proper error handling, return an object in case of failure
       return rejectWithValue(
         error.response?.data?.message || "فشل إضافة المنتج إلى المفضلة"
       );

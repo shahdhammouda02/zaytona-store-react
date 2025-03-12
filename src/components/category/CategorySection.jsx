@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Grid,
   Typography,
@@ -18,11 +18,14 @@ import foodcategory from "../../assets/images/foodcategory.png";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
-const CategorySection = () => {
+const CategorySection = ({
+  addToCart,
+  handleAddToCart,
+  addToFavorites,
+  removeFromFavorites,
+  favorites,
+}) => {
   const dispatch = useDispatch();
-  const [favorites, setFavorites] = useState([]);
-
-  // جلب التصنيفات من Redux
   const { categories, loading, error } = useSelector(
     (state) => state.categories || {}
   );
@@ -35,31 +38,34 @@ const CategorySection = () => {
   useEffect(() => {
     if (categories?.data?.length > 0) {
       categories.data.forEach((category) => {
-        console.log(
-          `📢 تحميل منتجات التصنيف: ${category.name} (${category.id})`
-        );
-        dispatch(fetchProductscategory(category.id));
+        if (!productsData[category.id]) {
+          dispatch(fetchProductscategory(category.id));
+        }
       });
     }
-  }, [categories, dispatch]);
+  }, [categories, dispatch, productsData]);
 
-  // إضافة أو إزالة من المفضلات
-  const toggleFavorite = (productId) => {
-    setFavorites((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
+  const handleAddToFavorites = (product) => {
+    dispatch(addToFavorites(product));
   };
+
+  const handleRemoveFromFavorites = (productId) => {
+    dispatch(removeFromFavorites(productId));
+  };
+
+  const isFavorite = (productId) =>
+    favorites.some((fav) => fav.id === productId);
 
   if (loading)
     return <Typography variant="h5">جاري تحميل التصنيفات...</Typography>;
+
   if (error)
     return (
       <Typography variant="h5" color="error">
         حدث خطأ: {error}
       </Typography>
     );
+
   if (!categories?.data?.length)
     return <Typography variant="h5">لا توجد تصنيفات لعرضها</Typography>;
 
@@ -79,13 +85,7 @@ const CategorySection = () => {
     >
       <Box>
         {categories?.data?.map((category) => {
-          // ✅ التحقق من أن التصنيف يحتوي على منتجات
-          const categoryProducts = productsData[category.id] || []; // إذا لم يكن هناك منتجات، استخدم مصفوفة فارغة
-
-          // تحقق إذا كانت المصفوفة فارغة أو لا
-          if (!categoryProducts.length) {
-            console.log(`لا توجد منتجات لهذا التصنيف: ${category.name}`);
-          }
+          const categoryProducts = productsData[category.id] || [];
 
           return (
             <Box
@@ -123,122 +123,112 @@ const CategorySection = () => {
                       overflow: "hidden",
                       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                       transition: "transform 0.3s ease",
-                      "&:hover": {
-                        transform: "scale(1.03)",
-                      },
+                      "&:hover": { transform: "scale(1.03)" },
                     }}
                   >
                     <CardMedia
                       component="img"
                       image={foodcategory}
                       alt={category.name}
-                      sx={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </Card>
                 </Grid>
 
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  md={3}
-                  style={{ display: "contents" }}
-                >
-                  {categoryProducts.length > 0 ? (
-                    categoryProducts.map((product) => (
-                      <Card
-                        key={product.id}
-                        sx={{
-                          maxWidth: 240,
-                          margin: "0 auto",
-                          borderRadius: "10px",
-                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                          transition: "transform 0.3s ease",
-                          "&:hover": {
-                            transform: "scale(1.05)",
-                            boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
-                          },
-                        }}
-                      >
-                        <CardMedia
-                          component="img"
-                          height="160"
-                          image={product.image}
-                          alt={product.name}
-                          sx={{
-                            objectFit: "contain",
-                            padding: "10px",
-                            borderRadius: "10px",
-                          }}
-                        />
-                        <CardContent>
-                          <Typography
-                            variant="body1"
-                            gutterBottom
-                            fontWeight="bold"
+                <Grid item xs={12} sm={6} md={9}>
+                  <Grid container spacing={3}>
+                    {categoryProducts.length > 0 ? (
+                      categoryProducts.map((product) => (
+                        <Grid item key={product.id} xs={12} sm={6} md={4}>
+                          <Card
                             sx={{
-                              fontSize: "14px",
-                              textAlign: "center",
-                              color: "#34495e",
+                              maxWidth: 240,
+                              margin: "0 auto",
+                              borderRadius: "10px",
+                              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                              transition: "transform 0.3s ease",
+                              "&:hover": {
+                                transform: "scale(1.05)",
+                                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
+                              },
                             }}
                           >
-                            {product.name}
-                          </Typography>
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              color: "#555",
-                              fontSize: "16px",
-                              textAlign: "center",
-                            }}
-                          >
-                            {product.price} $
-                          </Typography>
-                          <Box textAlign="center" mt={2}>
-                            <Button
-                              variant="contained"
-                              color="success"
-                              onClick={() => handleAddToCart(item)} // استخدام الدالة الجديدة
+                            <CardMedia
+                              component="img"
+                              height="160"
+                              image={product.image}
+                              alt={product.name}
                               sx={{
-                                borderRadius: "50px",
-                                padding: "8px 20px",
-                                textTransform: "none",
-                                fontWeight: "bold",
-                                backgroundColor: "#27ae60",
-                                "&:hover": {
-                                  backgroundColor: "#219653",
-                                },
+                                objectFit: "contain",
+                                padding: "10px",
+                                borderRadius: "10px",
                               }}
-                            >
-                              أضف إلى السلة
-                            </Button>
-                            <IconButton
-                              onClick={() => toggleFavorite(product.id)}
-                              sx={{
-                                color: favorites.some(
-                                  (fav) => fav.id === item.id
-                                )
-                                  ? "#E4312C"
-                                  : "inherit",
-                              }}
-                            >
-                              {favorites.includes(product.id) ? (
-                                <FavoriteIcon sx={{ color: "red" }} />
-                              ) : (
-                                <FavoriteBorderIcon />
-                              )}
-                            </IconButton>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    ))
-                  ) : (
-                    <Typography variant="h6">لا توجد منتجات لعرضها</Typography>
-                  )}
+                            />
+                            <CardContent>
+                              <Typography
+                                variant="body1"
+                                gutterBottom
+                                fontWeight="bold"
+                                sx={{
+                                  fontSize: "14px",
+                                  textAlign: "center",
+                                  color: "#34495e",
+                                }}
+                              >
+                                {product.name}
+                              </Typography>
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  color: "#555",
+                                  fontSize: "16px",
+                                  textAlign: "center",
+                                }}
+                              >
+                                {product.price} $
+                              </Typography>
+                              <Box textAlign="center" mt={2}>
+                                <Button
+                                  variant="contained"
+                                  color="success"
+                                  onClick={() => handleAddToCart(item)} // استخدام الدالة الجديدة
+                                  sx={{
+                                    borderRadius: "50px",
+                                    padding: "8px 20px",
+                                    textTransform: "none",
+                                    fontWeight: "bold",
+                                    backgroundColor: "#27ae60",
+                                    "&:hover": {
+                                      backgroundColor: "#219653",
+                                    },
+                                  }}
+                                >
+                                  أضف إلى السلة
+                                </Button>
+                                <IconButton
+                                  onClick={() =>
+                                    isFavorite(product.id)
+                                      ? handleRemoveFromFavorites(product.id)
+                                      : handleAddToFavorites(product)
+                                  }
+                                >
+                                  {isFavorite(product.id) ? (
+                                    <FavoriteIcon color="error" />
+                                  ) : (
+                                    <FavoriteBorderIcon />
+                                  )}
+                                </IconButton>
+                              </Box>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))
+                    ) : (
+                      <Typography variant="h6">
+                        لا توجد منتجات لعرضها
+                      </Typography>
+                    )}
+                  </Grid>
                 </Grid>
               </Grid>
 

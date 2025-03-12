@@ -3,18 +3,21 @@ import axiosFetching from "../../../API/axiosFetching";
 
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ product_id, quantity }, { rejectWithValue }) => {
+  async ({ product, quantity = 1 }, { rejectWithValue }) => {
     try {
-      const response = await axiosFetching.post(`${API_URL}/add`, {
-        product_id,
-        quantity,
+      const response = await axiosFetching.post(`/cart/add`, {
+        product_id: product.id,
+        quantity, // تمرير الكمية الصحيحة
       });
-      return response.data.cart;
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong");
+      return rejectWithValue(
+        error.response?.data || "حدث خطأ أثناء إضافة المنتج للسلة"
+      );
     }
   }
 );
+
 export const fetchcart = createAsyncThunk(
   "cart/fetchcart",
   async (_, { rejectWithValue }) => {
@@ -22,9 +25,7 @@ export const fetchcart = createAsyncThunk(
       const response = await axiosFetching.get("/cart");
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "فشل جلب السلة"
-      );
+      return rejectWithValue(error.response?.data?.message || "فشل جلب السلة");
     }
   }
 );
@@ -33,11 +34,11 @@ export const checkout = createAsyncThunk(
   "cart/checkout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosFetching.get("/checkout");
+      const response = await axiosFetching.post("/checkout");
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "فشل البيع"
+        error.response?.data?.message || "فشل عملية الدفع"
       );
     }
   }

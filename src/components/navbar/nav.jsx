@@ -113,9 +113,8 @@ const Navbar = ({
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
   const toggleFavoritesDrawer = () =>
     setFavoritesDrawerOpen(!favoritesDrawerOpen);
-
-  const totalAmount = cartItems.reduce(
-    (total, item) => total + item.salary * item.quantity,
+  const totalAmount = (cartItems || []).reduce(
+    (sum, item) => sum + item.salary * item.quantity,
     0
   );
 
