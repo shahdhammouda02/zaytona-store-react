@@ -8,6 +8,7 @@ import favoritesReducer from "./SLICE/favSlice/favSlice"; // ضع المسار �
 import cartReducer from "./SLICE/cartSlice/CartSlice"; // تأكد من المسار الصحيح
 import categoriesReducer from "./SLICE/mainCategory/mainCategorySlice";
 import subCategoriesReducer from "./SLICE/subCategory/subCategorySlice";
+import { thunk } from "redux-thunk"; // تعديل الاستيراد
 export const store = configureStore({
   reducer: {
     login: loginReducer,
@@ -20,6 +21,7 @@ export const store = configureStore({
     categories: categoriesReducer,
     subCategories: subCategoriesReducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 });
 
 export default store;

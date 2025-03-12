@@ -6,6 +6,7 @@ const initialState = {
   isLoading: false,
   error: null,
   success: false,
+  items: [], 
 };
 
 const cartSlice = createSlice({
@@ -25,7 +26,7 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.cart = action.payload;
+        state.cart.push(action.payload); // تحديث السلة بإضافة المنتج
         state.success = true;
         state.error = null;
       })
@@ -34,25 +35,24 @@ const cartSlice = createSlice({
         state.error = action.payload;
         state.success = false;
       })
-
       .addCase(fetchcart.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(fetchcart.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.cart = action.payload;
+        state.cart = action.payload; // تعيين المنتجات الموجودة في السلة من الـ API
         state.error = null;
       })
       .addCase(fetchcart.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-
       .addCase(checkout.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(checkout.fulfilled, (state, action) => {
+      .addCase(checkout.fulfilled, (state) => {
         state.isLoading = false;
+        state.cart = []; // تفريغ السلة بعد الشراء
         state.success = true;
         state.error = null;
       })
@@ -65,5 +65,4 @@ const cartSlice = createSlice({
 });
 
 export const { resetCart } = cartSlice.actions;
-
 export default cartSlice.reducer;
