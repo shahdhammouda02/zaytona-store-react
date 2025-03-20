@@ -26,7 +26,10 @@ const cartSlice = createSlice({
       })
       .addCase(fetchcart.fulfilled, (state, action) => {
         state.loading = false;
-    
+        state.cartItems = action.payload; // Update state with fetched cart data
+
+        // console.log("cart newwww: ");
+        // console.log(state.cartItems);
       })
       .addCase(fetchcart.rejected, (state, action) => {
         state.loading = false;
@@ -39,7 +42,7 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.cartItems.push(action.payload);
+        state.cartItems.cart.push(action.payload);
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;
@@ -52,9 +55,7 @@ const cartSlice = createSlice({
       })
       .addCase(removeFromcart.fulfilled, (state, action) => {
         state.loading = false;
-        state.cartItems = state.cartItems.filter(
-          (item) => item.id !== action.payload
-        );
+        state.cartItems = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(removeFromcart.rejected, (state, action) => {
         state.loading = false;

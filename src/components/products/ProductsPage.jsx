@@ -213,16 +213,24 @@ const SelectActionCard = ({
                 <CardMedia
                   component="img"
                   height="160"
-                  image={product.image}
+                  image={`http://127.0.0.1:8000${product.image}`}
                   alt={product.name}
+                  sx={{
+                    objectFit: "contain",
+                    padding: "10px",
+                    borderRadius: "10px",
+                  }}
+                  onError={(e) =>
+                    console.error("Image load error:", e.target.src)
+                  }
                 />
+
                 <CardContent>
                   <Typography variant="body1" fontWeight="bold">
                     {product.name}
                   </Typography>
                   <Typography variant="h6">{product.price} $</Typography>
                   <Box textAlign="center" mt={2}>
-                   
                     <Button
                       variant="contained"
                       color="success"

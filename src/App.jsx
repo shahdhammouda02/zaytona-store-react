@@ -36,7 +36,14 @@ const theme = createTheme({
 });
 
 const AppContent = () => {
- const cartItems = useSelector((state) => state.cart.cartItems); // Fetch cart data from Redux
+  const cartItems = useSelector((state) => state.cart?.cartItems?.cart || []);
+  const total_price = useSelector(
+    (state) => state.cart?.cartItems?.total_price || []
+  );
+  // console.log("sss");
+  // console.log(cartItems);
+  const cartItems1 = [];
+
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -49,9 +56,21 @@ const AppContent = () => {
   // Fetch cart items when the user is logged in
   useEffect(() => {
     if (isLoggedIn) {
+      //
+
+      //const fetchCartItems = async () => {
+      // Dispatch the fetchcart action and await the result
+      //await dispatch(fetchcart()); // This will update the state with cart items when completed
+      //};
+
+      //fetchCartItems(); // Call the function to fetch data
+
+      //
       dispatch(fetchcart()); // Fetch cart when user is logged in
+      // console.log("aaa :: ");
+      //console.log(cartItems)
     }
-  }, [dispatch, isLoggedIn]);
+  }, [dispatch, isLoggedIn, cartItems]);
 
   // ✅ Add product to favorites
   const handleAddToFavorites = (product) => {
@@ -71,11 +90,19 @@ const AppContent = () => {
   const handleRemoveFromFavorites = (productId) => {
     dispatch(removeFromFavorites(productId));
   };
+  const handleRemoveProductCart = (product_id) => {
+    console.log("Removing product ID:", product_id);
+    console.trace(); // This will show where it's being called from
+    dispatch(removeFromcart(product_id));
+  };
 
   // ✅ Clear all products from favorites
   const handleClearFavorites = () => {
     dispatch(removeAllFromFavorites());
   };
+  const handelclearcart =() =>{
+    dispatch(removeAllFromCart());
+  }
 
   const updateCategories = (categories) => {
     setCategories(categories);
@@ -111,12 +138,15 @@ const AppContent = () => {
       {!isLoginPage && (
         <Navbar
           cartItems={cartItems}
+          total_price={total_price}
           categories={categories}
           favorites={favorites}
           removeFromFavorites={handleRemoveFromFavorites}
           clearFavorites={handleClearFavorites}
           addToFavorites={handleAddToFavorites}
-          
+          checkout={handleCheckout}
+          removeproductcart={handleRemoveProductCart}
+          clearCart={handelclearcart}
         />
       )}
 
