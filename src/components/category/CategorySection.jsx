@@ -20,7 +20,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 const CategorySection = ({
   addToCart,
-  handleAddToCart,
+
   addToFavorites,
   removeFromFavorites,
   favorites,
@@ -123,7 +123,9 @@ const CategorySection = ({
                       overflow: "hidden",
                       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                       transition: "transform 0.3s ease",
-                      "&:hover": { transform: "scale(1.03)" },
+                      "&:hover": {
+                        transform: "scale(1.03)",
+                      },
                     }}
                   >
                     <CardMedia
@@ -138,7 +140,7 @@ const CategorySection = ({
                 <Grid item xs={12} sm={6} md={9}>
                   <Grid container spacing={3}>
                     {categoryProducts.length > 0 ? (
-                      categoryProducts.map((product) => (
+                      categoryProducts.slice(0, 3).map((product) => (
                         <Grid item key={product.id} xs={12} sm={6} md={4}>
                           <Card
                             sx={{
@@ -156,13 +158,17 @@ const CategorySection = ({
                             <CardMedia
                               component="img"
                               height="160"
-                              image={product.image}
+                              image={`http://127.0.0.1:8000${product.image}`}
                               alt={product.name}
                               sx={{
                                 objectFit: "contain",
                                 padding: "10px",
                                 borderRadius: "10px",
                               }}
+                              
+                              onError={(e) =>
+                                console.error("Image load error:", e.target.src)
+                              }
                             />
                             <CardContent>
                               <Typography

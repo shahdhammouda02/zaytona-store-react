@@ -58,11 +58,14 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
 
 const Navbar = ({
   cartItems,
+  total_price,
   updateQuantity,
-  removeFromCart,
+  clearCart,
   favorites,
   removeFromFavorites,
   clearFavorites,
+  checkout,
+  removeproductcart,
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [favoritesDrawerOpen, setFavoritesDrawerOpen] = useState(false);
@@ -92,7 +95,7 @@ const Navbar = ({
       dispatch(fetchSearchResults(searchTerm));
     }
   }, [searchTerm, dispatch]);
-  console.log("الفئات:", categories);
+  // console.log("الفئات:", categories);
 
   useEffect(() => {
     console.log("نتائج البحث:", results); // طباعة النتائج في الكونسول
@@ -107,21 +110,14 @@ const Navbar = ({
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
   const toggleFavoritesDrawer = () =>
     setFavoritesDrawerOpen(!favoritesDrawerOpen);
-  const totalAmount = (cartItems || []).reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  const removeAllItems = () =>
-    cartItems.forEach((item) => removeFromCart(item.id));
+  const totalAmount = total_price;
 
   const handlePayment = () => {
     if (cartItems.length === 0) {
       alert("السلة فارغة. لا يمكن إتمام الدفع.");
       return;
     }
-    alert(`تم الدفع بنجاح! المبلغ الإجمالي: ${totalAmount.toFixed(2)} $`);
-    removeAllItems();
+    alert(`تم الدفع بنجاح! المبلغ الإجمالي: ${totalAmount} $`);
   };
 
   const handleAuthToggle = () => {
@@ -418,6 +414,7 @@ const Navbar = ({
           sx: { width: cartItems.length === 0 ? "300px" : "400px" },
         }}
       >
+        {cartItems.length}
         <Box sx={{ width: "100%", padding: 2 }}>
           <Box
             sx={{
@@ -481,21 +478,26 @@ const Navbar = ({
                         flexGrow: 1,
                       }}
                     >
-                      <Avatar
-                        src={item.image}
-                        alt={item.name}
-                        sx={{ width: 80, height: 80, marginRight: 3 }}
-                      />
+                      {item?.product && (
+                        <Avatar
+                          src={`http://127.0.0.1:8000/storage/${item.product.image}`}
+                          alt={item.product.name}
+                          sx={{ width: 80, height: 80, marginRight: 3 }}
+                        />
+                      )}
+
                       <Box sx={{ textAlign: "right", marginRight: 2 }}>
                         <Typography
                           variant="subtitle1"
                           sx={{ fontWeight: "bold", fontSize: "14px" }}
                         >
-                          {item.name}
+                          {item.product?.name ?? "Unknown Product"}
                         </Typography>
+
                         <Typography variant="body2" color="text.secondary">
-                          السعر: {item.price} $
+                          السعر: {item.product?.price ?? "غير متوفر"} $
                         </Typography>
+
                         <Box
                           sx={{
                             display: "flex",
@@ -549,12 +551,8 @@ const Navbar = ({
                       </Box>
                     </Box>
                     <IconButton
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeproductcart(item.product_id)} // ✅ Now it only runs on click
                       color="error"
-                      sx={{
-                        marginLeft: 2,
-                        "&:hover": { backgroundColor: "inherit !important" },
-                      }}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -579,7 +577,7 @@ const Navbar = ({
                     variant="contained"
                     color="primary"
                     fullWidth
-                    onClick={handlePayment}
+                    onClick={checkout}
                     sx={{
                       backgroundColor: "#1e8234",
                       fontSize: "16px",
@@ -587,13 +585,13 @@ const Navbar = ({
                       marginBottom: "20px",
                     }}
                   >
-                    ادفع: {totalAmount.toFixed(2)} $
+                    ادفع: {totalAmount} $
                   </Button>
                   <Button
                     variant="contained"
+                    onClick={clearCart}
                     color="error"
                     startIcon={<DeleteSweepIcon />}
-                    onClick={removeAllItems}
                     sx={{
                       textTransform: "none",
                       fontWeight: "bold",
@@ -681,7 +679,7 @@ const Navbar = ({
                       }}
                     >
                       <Avatar
-                        src={item.image}
+                        src={`http://127.0.0.1:8000${item.image}`}
                         alt={item.name}
                         sx={{ width: 80, height: 80, marginRight: 3 }}
                       />
